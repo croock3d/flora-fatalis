@@ -52,34 +52,35 @@ describe('DashboardPage', () => {
     }).compileComponents();
   }
 
-  it('renders overdue, today and upcoming tasks from the backend', async () => {
+  it('renders overdue and today first, upcoming later', async () => {
     await configure({ overdue: [overdue], dueToday: [dueToday], upcoming: [upcoming] });
     const fixture = TestBed.createComponent(DashboardPage);
     await fixture.whenStable();
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Co mam dziś zrobić?');
-    expect(text).toContain('Zaległe');
+    expect(text).toContain('Co dziś wymaga uwagi?');
     expect(text).toContain('Monstera');
     expect(text).toContain('2 dni zaległości');
     expect(text).toContain('Fikus');
-    expect(text).toContain('nawożenie');
-    expect(text).toContain('Aloes');
-    expect(text).toContain('Podlej');
     expect(text).toContain('Nawieź');
+    expect(text).toContain('Aloes');
+    expect(text).toContain('Nadchodzące');
+    expect(text).toContain('Podlej');
     expect(text).not.toContain('Wszystko na bieżąco');
+    expect(text.indexOf('Monstera')).toBeLessThan(text.indexOf('Aloes'));
   });
 
-  it('shows a positive message when nothing is overdue', async () => {
+  it('does not show a dashboard status banner when nothing is overdue', async () => {
     await configure({ overdue: [], dueToday: [dueToday], upcoming: [] });
     const fixture = TestBed.createComponent(DashboardPage);
     await fixture.whenStable();
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(text).toContain('Wszystko na bieżąco — nic nie zalega.');
     expect(text).toContain('Fikus');
+    expect(text).toContain('Nawieź · dzisiaj');
+    expect(text).not.toContain('Wszystko na bieżąco — nic nie zalega.');
     expect(text).not.toContain('Zaległe');
   });
 
@@ -91,7 +92,7 @@ describe('DashboardPage', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Nie masz zaplanowanych zadań na najbliższe dni.');
-    expect(compiled.querySelectorAll('.dash__card').length).toBe(0);
+    expect(compiled.querySelectorAll('.dash__row').length).toBe(0);
   });
 
   it('links plant names to plant details', async () => {

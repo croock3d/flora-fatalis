@@ -19,11 +19,15 @@ export class DashboardPage {
   protected readonly error = signal<string | null>(null);
   protected readonly wateringPlantId = signal<string | null>(null);
   protected readonly quantityDrafts = signal<Record<string, string>>({});
-  protected readonly hasOverdue = computed(() => (this.dashboard()?.overdue.length ?? 0) > 0);
   protected readonly hasAnyTasks = computed(() => {
     const data = this.dashboard();
     if (!data) return false;
     return data.overdue.length + data.dueToday.length + data.upcoming.length > 0;
+  });
+  protected readonly todayItems = computed(() => {
+    const data = this.dashboard();
+    if (!data) return [];
+    return [...data.overdue, ...data.dueToday];
   });
 
   constructor() {
@@ -35,12 +39,21 @@ export class DashboardPage {
     return `${days} dni zaległości`;
   }
 
+  protected todayLabel(): string {
+    return new Intl.DateTimeFormat('pl-PL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'Europe/Warsaw',
+    }).format(new Date());
+  }
+
   protected careLabel(type: string): string {
     return type === 'FERTILIZING' ? 'nawożenie' : 'podlewanie';
   }
 
-  protected careIcon(type: string): string {
-    return type === 'FERTILIZING' ? '🌿' : '💧';
+  protected actionVerb(type: string): string {
+    return type === 'FERTILIZING' ? 'Nawieź' : 'Podlej';
   }
 
   protected itemKey(item: DashboardItemDto): string {
