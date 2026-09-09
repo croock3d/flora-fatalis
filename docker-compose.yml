@@ -27,10 +27,10 @@ services:
       PGUSER: postgress
       PGPASSWORD: postgress
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-      PHOTOS_DIR: /uploads
+      PHOTOS_DIR: /data/photos
       SPRING_LIQUIBASE_CONTEXTS: dev
     volumes:
-      - flora_uploads:/uploads
+      - flora_uploads:/data/photos
     depends_on:
       postgres:
         condition: service_healthy

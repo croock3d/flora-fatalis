@@ -14,6 +14,11 @@ public class LocalPhotoStorage implements PhotoStorage {
 
   public LocalPhotoStorage(@Value("${app.photos.dir:uploads}") String photosDir) {
     this.root = Path.of(photosDir).toAbsolutePath().normalize();
+    try {
+      Files.createDirectories(this.root);
+    } catch (IOException ex) {
+      throw new IllegalStateException("Failed to create photos directory", ex);
+    }
   }
 
   @Override

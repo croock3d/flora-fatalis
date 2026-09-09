@@ -1,3 +1,7 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+
 spring:
   datasource:
     url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
@@ -10,4 +14,4 @@ app:
   jwt:
     secret: ${JWT_SECRET}
   photos:
-    dir: ${PHOTOS_DIR:uploads}
+    dir: ${PHOTOS_DIR:/data/photos}
