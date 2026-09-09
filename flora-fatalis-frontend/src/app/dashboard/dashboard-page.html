@@ -11,131 +11,98 @@
   @if (loading()) {
     <p class="dash__muted">Ładowanie...</p>
   } @else if (dashboard(); as data) {
-    @if (!hasAnyTasks()) {
+    @if (todayItems().length === 0) {
       <div class="empty">
-        <p class="empty__title">Nic do zrobienia</p>
-        <p class="empty__text">Żadna roślina nie wymaga dziś pielęgnacji. Wróć, gdy pojawi się podlewanie albo nawożenie.</p>
-        <a class="btn btn--ghost" routerLink="/plants">Zobacz rośliny</a>
+        <p class="empty__title">Nic do zrobienia dziś</p>
+        <p class="empty__text">Żadna roślina nie wymaga teraz podlewania ani nawożenia.</p>
       </div>
     } @else {
-      @if (todayItems().length === 0) {
-        <p class="dash__muted">Nic na dzisiaj. Najbliższe zadania są poniżej.</p>
-      } @else {
-        <ul class="dash__list">
-          @for (item of todayItems(); track itemKey(item)) {
-            <li class="dash__row" [class.dash__row--overdue]="item.overdueDays > 0">
-              <a class="dash__thumb" [routerLink]="['/plants', item.plantId]" [attr.aria-label]="item.plantName">
-                @if (item.primaryPhotoUrl; as url) {
-                  <img [src]="photoUrls.objectUrl(url) | async" alt="" />
-                }
-              </a>
-              <div class="dash__identity">
-                <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
-                <p
-                  class="dash__status"
-                  [class.dash__status--overdue]="item.overdueDays > 0"
-                  [class.dash__status--today]="item.overdueDays === 0"
+      <ul class="dash__list">
+        @for (item of todayItems(); track itemKey(item)) {
+          <li class="dash__row" [class.dash__row--overdue]="item.overdueDays > 0">
+            <a class="dash__thumb" [routerLink]="['/plants', item.plantId]" [attr.aria-label]="item.plantName">
+              @if (item.primaryPhotoUrl; as url) {
+                <img [src]="photoUrls.objectUrl(url) | async" alt="" />
+              }
+            </a>
+            <div class="dash__identity">
+              <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
+              @if (locationFor(item)) {
+                <p class="dash__place">{{ locationFor(item) }}</p>
+              }
+            </div>
+            <p
+              class="dash__status"
+              [class.dash__status--overdue]="item.overdueDays > 0"
+              [class.dash__status--today]="item.overdueDays === 0"
+            >
+              @if (item.overdueDays > 0) {
+                {{ actionVerb(item.careType) }} · {{ overdueLabel(item.overdueDays) }}
+              } @else {
+                {{ actionVerb(item.careType) }} · dzisiaj
+              }
+            </p>
+            <div class="dash__actions">
+              @if (item.careType === 'WATERING') {
+                <label class="dash__field">
+                  <input
+                    class="dash__ml"
+                    type="number"
+                    min="1"
+                    inputmode="numeric"
+                    placeholder="—"
+                    [ngModel]="quantityFor(item.plantId)"
+                    (ngModelChange)="setQuantity(item.plantId, $event)"
+                    [attr.aria-label]="'Ilość wody, ' + item.plantName"
+                  />
+                  <span>ml</span>
+                </label>
+                <button
+                  class="btn"
+                  type="button"
+                  [disabled]="wateringPlantId() === itemKey(item)"
+                  (click)="water(item)"
                 >
-                  @if (item.overdueDays > 0) {
-                    {{ actionVerb(item.careType) }} · {{ overdueLabel(item.overdueDays) }}
-                  } @else {
-                    {{ actionVerb(item.careType) }} · dzisiaj
+                  {{ wateringPlantId() === itemKey(item) ? '...' : 'Podlej' }}
+                </button>
+              } @else {
+                <button
+                  class="btn"
+                  type="button"
+                  [disabled]="wateringPlantId() === itemKey(item)"
+                  (click)="fertilize(item)"
+                >
+                  {{ wateringPlantId() === itemKey(item) ? '...' : 'Nawieź' }}
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (collection().length > 0) {
+      <section class="dash__collection">
+        <div class="dash__collectionHead">
+          <h2 class="dash__sectionLabel">Kolekcja</h2>
+          <a class="dash__all" routerLink="/plants">Wszystkie</a>
+        </div>
+        <ul class="dash__plants">
+          @for (plant of collection(); track plant.id) {
+            <li>
+              <a class="dash__plantCard" [routerLink]="['/plants', plant.id]">
+                <div class="dash__plantPhoto">
+                  @if (plant.primaryPhotoUrl; as url) {
+                    <img [src]="photoUrls.objectUrl(url) | async" alt="" />
                   }
-                </p>
-              </div>
-              <div class="dash__actions">
-                @if (item.careType === 'WATERING') {
-                  <label class="dash__field">
-                    <input
-                      class="dash__ml"
-                      type="number"
-                      min="1"
-                      inputmode="numeric"
-                      placeholder="—"
-                      [ngModel]="quantityFor(item.plantId)"
-                      (ngModelChange)="setQuantity(item.plantId, $event)"
-                      [attr.aria-label]="'Ilość wody, ' + item.plantName"
-                    />
-                    <span>ml</span>
-                  </label>
-                  <button
-                    class="btn"
-                    type="button"
-                    [disabled]="wateringPlantId() === itemKey(item)"
-                    (click)="water(item)"
-                  >
-                    {{ wateringPlantId() === itemKey(item) ? '...' : 'Podlej' }}
-                  </button>
-                } @else {
-                  <button
-                    class="btn"
-                    type="button"
-                    [disabled]="wateringPlantId() === itemKey(item)"
-                    (click)="fertilize(item)"
-                  >
-                    {{ wateringPlantId() === itemKey(item) ? '...' : 'Nawieź' }}
-                  </button>
-                }
-              </div>
+                </div>
+                <p class="dash__plantName">{{ plant.name }}</p>
+                <p class="dash__plantMeta">{{ plantLocation(plant) }}</p>
+              </a>
             </li>
           }
         </ul>
-      }
-
-      @if (data.upcoming.length > 0) {
-        <section class="dash__upcoming">
-          <h2 class="dash__sectionLabel">Nadchodzące</h2>
-          <ul class="dash__list dash__list--quiet">
-            @for (item of data.upcoming; track itemKey(item)) {
-              <li class="dash__row dash__row--quiet">
-                <a class="dash__thumb" [routerLink]="['/plants', item.plantId]" [attr.aria-label]="item.plantName">
-                  @if (item.primaryPhotoUrl; as url) {
-                    <img [src]="photoUrls.objectUrl(url) | async" alt="" />
-                  }
-                </a>
-                <div class="dash__identity">
-                  <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
-                  <p class="dash__status">{{ careLabel(item.careType) }} · {{ dueDate(item.dueOn) }}</p>
-                </div>
-                <div class="dash__actions">
-                  @if (item.careType === 'WATERING') {
-                    <label class="dash__field">
-                      <input
-                        class="dash__ml"
-                        type="number"
-                        min="1"
-                        inputmode="numeric"
-                        placeholder="—"
-                        [ngModel]="quantityFor(item.plantId)"
-                        (ngModelChange)="setQuantity(item.plantId, $event)"
-                        [attr.aria-label]="'Ilość wody, ' + item.plantName"
-                      />
-                      <span>ml</span>
-                    </label>
-                    <button
-                      class="btn"
-                      type="button"
-                      [disabled]="wateringPlantId() === itemKey(item)"
-                      (click)="water(item)"
-                    >
-                      {{ wateringPlantId() === itemKey(item) ? '...' : 'Podlej' }}
-                    </button>
-                  } @else {
-                    <button
-                      class="btn"
-                      type="button"
-                      [disabled]="wateringPlantId() === itemKey(item)"
-                      (click)="fertilize(item)"
-                    >
-                      {{ wateringPlantId() === itemKey(item) ? '...' : 'Nawieź' }}
-                    </button>
-                  }
-                </div>
-              </li>
-            }
-          </ul>
-        </section>
-      }
+      </section>
     }
   }
 </section>

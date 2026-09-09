@@ -3,9 +3,14 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import { forkJoin } from 'rxjs';
+
 import { CareApiService } from '../care/care-api.service';
 import { CareDashboardDto, DashboardItemDto } from '../care/care.dto';
+import { LocationsApiService } from '../locations/locations-api.service';
 import { PhotoUrlService } from '../photos/photo-url.service';
+import { PlantDto } from '../plants/plant.dto';
+import { PlantsApiService } from '../plants/plants-api.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -15,9 +20,13 @@ import { PhotoUrlService } from '../photos/photo-url.service';
 })
 export class DashboardPage {
   private readonly api = inject(CareApiService);
+  private readonly plantsApi = inject(PlantsApiService);
+  private readonly locationsApi = inject(LocationsApiService);
   protected readonly photoUrls = inject(PhotoUrlService);
 
   protected readonly dashboard = signal<CareDashboardDto | null>(null);
+  protected readonly plants = signal<PlantDto[]>([]);
+  protected readonly locationNames = signal<Record<string, string>>({});
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly wateringPlantId = signal<string | null>(null);
@@ -32,6 +41,7 @@ export class DashboardPage {
     if (!data) return [];
     return [...data.overdue, ...data.dueToday];
   });
+  protected readonly collection = computed(() => this.plants().slice(0, 8));
 
   constructor() {
     this.reload();
@@ -105,6 +115,14 @@ export class DashboardPage {
     });
   }
 
+  protected locationFor(item: DashboardItemDto): string {
+    return item.locationName || '';
+  }
+
+  protected plantLocation(plant: PlantDto): string {
+    return this.locationNames()[plant.locationId] ?? '';
+  }
+
   protected quantityFor(plantId: string): string {
     return this.quantityDrafts()[plantId] || '';
   }
@@ -128,9 +146,17 @@ export class DashboardPage {
   }
 
   private reload(): void {
-    this.api.dashboard().subscribe({
-      next: (dashboard) => {
+    forkJoin({
+      dashboard: this.api.dashboard(),
+      plants: this.plantsApi.list(),
+      locations: this.locationsApi.list(),
+    }).subscribe({
+      next: ({ dashboard, plants, locations }) => {
         this.dashboard.set(dashboard);
+        this.plants.set(plants);
+        this.locationNames.set(
+          Object.fromEntries(locations.map((location) => [location.id, location.name])),
+        );
         this.loading.set(false);
         this.error.set(null);
       },

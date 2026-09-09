@@ -1,7 +1,7 @@
-<div class="app">
+<div class="app" [class.app--auth]="!isAuthenticated()">
   @if (isAuthenticated()) {
-    <header class="app__header">
-      <a class="app__brand" routerLink="/dashboard" aria-label="Przejdź do dashboardu">
+    <aside class="app__sidebar">
+      <a class="app__brand" routerLink="/dashboard" aria-label="Przejdź do dzisiaj">
         <svg class="app__brandIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 28"
              width="14" height="22" fill="none" aria-hidden="true">
           <path d="M9 1.5c-3.4 3.8-6.4 8.4-6.4 12.6 0 3.7 2.8 6.7 6.4 6.7s6.4-3 6.4-6.7C15.4 9.9 12.4 5.3 9 1.5Z"
@@ -14,72 +14,48 @@
       <nav class="app__nav" aria-label="Nawigacja">
         <a class="app__navLink" routerLink="/dashboard" routerLinkActive="active">Dzisiaj</a>
         <a class="app__navLink" routerLink="/plants" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Rośliny</a>
+        <a class="app__navLink" routerLink="/locations" routerLinkActive="active">Lokalizacje</a>
+        <a class="app__navLink" routerLink="/household" routerLinkActive="active">
+          Domownicy
+          @if (householdStore.hasPendingInvitation()) {
+            <span class="app__navBadge">1</span>
+          }
+        </a>
       </nav>
 
-      <div class="app__userSection">
-        <div class="app__desktopProfile">
-          <button
-            class="app__userPill"
-            type="button"
-            (click)="toggleUserMenu()"
-            [class.app__userPill--open]="userMenuOpen()"
-            aria-label="Menu profilu"
-          >
-            <span class="app__userAvatar">{{ initials() }}</span>
-            @if (displayName()) {
-              <span class="app__userName">{{ displayName() }}</span>
-            }
-            @if (householdStore.hasPendingInvitation()) {
-              <span class="app__desktopProfileBadge"></span>
-            }
-          </button>
-
-          @if (userMenuOpen()) {
-            <div class="app__userMenuBackdrop" (click)="closeUserMenu()"></div>
-            <div class="app__desktopUserMenu" role="menu">
-              @if (displayName()) {
-                <div class="app__userMenuName">{{ displayName() }}</div>
-              }
-              <a
-                class="app__userMenuLink"
-                routerLink="/species"
-                role="menuitem"
-                (click)="closeUserMenu()"
-              >
-                Gatunki
-              </a>
-              <a
-                class="app__userMenuLink"
-                routerLink="/locations"
-                role="menuitem"
-                (click)="closeUserMenu()"
-              >
-                Lokalizacje
-              </a>
-              <a
-                class="app__userMenuLink"
-                routerLink="/household"
-                role="menuitem"
-                (click)="closeUserMenu()"
-              >
-                Domownicy
-                @if (householdStore.hasPendingInvitation()) {
-                  <span class="app__userMenuBadge">1</span>
-                }
-              </a>
-              <button
-                class="app__userMenuLogout"
-                type="button"
-                (click)="logout()"
-                role="menuitem"
-              >
-                Wyloguj się
-              </button>
-            </div>
+      <div class="app__sidebarFoot">
+        <button
+          class="app__userPill"
+          type="button"
+          (click)="toggleUserMenu()"
+          [class.app__userPill--open]="userMenuOpen()"
+          aria-label="Menu profilu"
+        >
+          <span class="app__userAvatar">{{ initials() }}</span>
+          @if (displayName()) {
+            <span class="app__userName">{{ displayName() }}</span>
           }
-        </div>
+          @if (householdStore.hasPendingInvitation()) {
+            <span class="app__desktopProfileBadge"></span>
+          }
+        </button>
+
+        @if (userMenuOpen()) {
+          <div class="app__userMenuBackdrop" (click)="closeUserMenu()"></div>
+          <div class="app__desktopUserMenu" role="menu">
+            @if (displayName()) {
+              <div class="app__userMenuName">{{ displayName() }}</div>
+            }
+            <a class="app__userMenuLink" routerLink="/species" role="menuitem" (click)="closeUserMenu()">
+              Gatunki
+            </a>
+            <button class="app__userMenuLogout" type="button" (click)="logout()" role="menuitem">
+              Wyloguj się
+            </button>
+          </div>
+        }
       </div>
-    </header>
+    </aside>
   }
 
   <main class="app__main" [class.app__main--auth]="!isAuthenticated()">
@@ -90,7 +66,7 @@
     <nav class="app__bottomNav" aria-label="Nawigacja">
       <a class="app__bottomNavLink" routerLink="/dashboard" routerLinkActive="app__bottomNavLink--active">Dzisiaj</a>
       <a class="app__bottomNavLink" routerLink="/plants" routerLinkActive="app__bottomNavLink--active" [routerLinkActiveOptions]="{ exact: true }">Rośliny</a>
-      <a class="app__bottomNavLink" routerLink="/plants/new" routerLinkActive="app__bottomNavLink--active">Dodaj</a>
+      <a class="app__bottomNavLink" routerLink="/household" routerLinkActive="app__bottomNavLink--active">Więcej</a>
     </nav>
   }
 </div>

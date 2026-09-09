@@ -8,6 +8,9 @@ import com.crooked.florafatalis.care.domain.CareRecommendation;
 import com.crooked.florafatalis.care.domain.CareType;
 import com.crooked.florafatalis.care.domain.FertilizingCarePolicy;
 import com.crooked.florafatalis.household.domain.HouseholdId;
+import com.crooked.florafatalis.location.application.port.out.LocationRepository;
+import com.crooked.florafatalis.location.domain.Location;
+import com.crooked.florafatalis.location.domain.LocationId;
 import com.crooked.florafatalis.photo.application.port.out.PlantPhotoRepository;
 import com.crooked.florafatalis.photo.domain.PlantPhoto;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
@@ -45,6 +48,7 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
   private final FertilizingCarePolicy fertilizingCarePolicy;
   private final ActiveHouseholdPort activeHouseholdPort;
   private final PlantPhotoRepository plantPhotoRepository;
+  private final LocationRepository locationRepository;
   private final Clock clock;
 
   @Value("${app.timezone:Europe/Warsaw}")
@@ -68,6 +72,9 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
     Map<PlantId, CareEvent> latestWatering = latestByPlant(householdId, CareType.WATERING);
     Map<PlantId, CareEvent> latestFertilizing = latestByPlant(householdId, CareType.FERTILIZING);
     Map<PlantId, String> primaryPhotoUrls = primaryPhotoUrls(householdId);
+    Map<LocationId, String> locationNames =
+        locationRepository.findByHousehold(householdId).stream()
+            .collect(Collectors.toMap(Location::id, Location::name, (left, right) -> left));
     List<DashboardItem> overdue = new ArrayList<>();
     List<DashboardItem> dueToday = new ArrayList<>();
     List<DashboardItem> upcoming = new ArrayList<>();
@@ -86,6 +93,7 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
               latestWatering.get(plant.id()),
               today,
               zone,
+              locationNames.get(plant.locationId()),
               primaryPhotoUrls.get(plant.id())),
           today);
       fertilizingCarePolicy
@@ -106,6 +114,7 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
                           CareType.FERTILIZING,
                           recommendation,
                           today,
+                          locationNames.get(plant.locationId()),
                           primaryPhotoUrls.get(plant.id())),
                       today));
     }
@@ -124,10 +133,11 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
       CareEvent last,
       LocalDate today,
       ZoneId zone,
+      String locationName,
       String primaryPhotoUrl) {
     Optional<Instant> lastAt = Optional.ofNullable(last).map(CareEvent::performedAt);
     CareRecommendation recommendation = carePolicy.recommend(plant, species, lastAt, today, zone);
-    return item(plant, CareType.WATERING, recommendation, today, primaryPhotoUrl);
+    return item(plant, CareType.WATERING, recommendation, today, locationName, primaryPhotoUrl);
   }
 
   private DashboardItem item(
@@ -135,11 +145,13 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
       CareType careType,
       CareRecommendation recommendation,
       LocalDate today,
+      String locationName,
       String primaryPhotoUrl) {
     long days = ChronoUnit.DAYS.between(recommendation.dueOn(), today);
     return DashboardItem.of(
         plant.id(),
         plant.name(),
+        locationName,
         careType.name(),
         recommendation.dueOn(),
         (int) Math.max(days, 0),

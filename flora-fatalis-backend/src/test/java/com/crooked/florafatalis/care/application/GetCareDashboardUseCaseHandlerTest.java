@@ -13,6 +13,7 @@ import com.crooked.florafatalis.care.domain.CareType;
 import com.crooked.florafatalis.care.domain.FertilizingCarePolicy;
 import com.crooked.florafatalis.care.domain.IntervalCarePolicy;
 import com.crooked.florafatalis.household.domain.HouseholdId;
+import com.crooked.florafatalis.location.application.port.out.LocationRepository;
 import com.crooked.florafatalis.location.domain.LocationId;
 import com.crooked.florafatalis.photo.application.port.out.PlantPhotoRepository;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
@@ -43,6 +44,7 @@ class GetCareDashboardUseCaseHandlerTest {
   @Mock private CareEventRepository careEventRepository;
   @Mock private ActiveHouseholdPort activeHouseholdPort;
   @Mock private PlantPhotoRepository plantPhotoRepository;
+  @Mock private LocationRepository locationRepository;
 
   private GetCareDashboardUseCaseHandler handler;
 
@@ -83,11 +85,13 @@ class GetCareDashboardUseCaseHandlerTest {
             new FertilizingCarePolicy(),
             activeHouseholdPort,
             plantPhotoRepository,
+            locationRepository,
             Clock.fixed(now, ZoneOffset.UTC));
     ReflectionTestUtils.setField(handler, "timezone", "UTC");
     lenient()
         .when(plantPhotoRepository.findPrimaryByHouseholdId(householdId))
         .thenReturn(List.of());
+    lenient().when(locationRepository.findByHousehold(householdId)).thenReturn(List.of());
   }
 
   @Test
@@ -282,6 +286,7 @@ class GetCareDashboardUseCaseHandlerTest {
             new FertilizingCarePolicy(),
             activeHouseholdPort,
             plantPhotoRepository,
+            locationRepository,
             Clock.fixed(lateUtc, ZoneOffset.UTC));
     ReflectionTestUtils.setField(warsawHandler, "timezone", "Europe/Warsaw");
     Plant plant = plant("Fikus", null);

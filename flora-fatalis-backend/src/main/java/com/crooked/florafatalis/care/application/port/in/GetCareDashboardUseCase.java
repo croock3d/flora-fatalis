@@ -16,6 +16,7 @@ public interface GetCareDashboardUseCase {
   record DashboardItem(
       UUID plantId,
       String plantName,
+      String locationName,
       String careType,
       LocalDate dueOn,
       int overdueDays,
@@ -24,12 +25,13 @@ public interface GetCareDashboardUseCase {
     public static DashboardItem of(
         PlantId plantId,
         String plantName,
+        String locationName,
         String careType,
         LocalDate dueOn,
         int overdueDays,
         String primaryPhotoUrl) {
       return new DashboardItem(
-          plantId.value(), plantName, careType, dueOn, overdueDays, primaryPhotoUrl);
+          plantId.value(), plantName, locationName, careType, dueOn, overdueDays, primaryPhotoUrl);
     }
   }
 }

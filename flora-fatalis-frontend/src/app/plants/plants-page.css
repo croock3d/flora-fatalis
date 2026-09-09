@@ -1,7 +1,7 @@
 .plants {
-  max-width: 720px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: var(--space-6) var(--space-5) var(--space-8);
+  padding: var(--space-6) var(--space-6) var(--space-8);
 }
 
 .plants__header {
@@ -51,7 +51,7 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--space-6) var(--space-4);
 }
 

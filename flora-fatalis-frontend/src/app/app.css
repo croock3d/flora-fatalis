@@ -1,42 +1,40 @@
 .app {
   min-height: 100dvh;
   background: var(--color-ivory);
+  display: grid;
+  grid-template-columns: 232px 1fr;
 }
 
-.app__header {
-  position: fixed;
+.app--auth {
+  grid-template-columns: 1fr;
+}
+
+.app__sidebar {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
+  align-self: start;
+  height: 100dvh;
+  background: #ece6d8;
+  border-right: 1px solid var(--color-line);
+  padding: var(--space-6) var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
   z-index: 10;
   view-transition-name: app-header;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  height: var(--header-height);
-  padding: 0 max(var(--space-5), env(safe-area-inset-right)) 0
-    max(var(--space-5), env(safe-area-inset-left));
-  background: #ece6d8;
-  border-bottom: 1px solid var(--color-line);
-  max-width: 100vw;
-  box-sizing: border-box;
 }
 
 .app__brand {
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px;
   text-decoration: none;
-  user-select: none;
-  cursor: pointer;
   color: var(--color-charcoal);
 }
 
 .app__brandIcon {
   color: var(--color-moss);
-  flex-shrink: 0;
 }
 
 .app__brandText {
@@ -44,19 +42,21 @@
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-charcoal);
 }
 
 .app__nav {
   display: flex;
-  align-items: center;
-  gap: var(--space-1);
+  flex-direction: column;
+  gap: 2px;
 }
 
 .app__navLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: var(--color-muted);
   text-decoration: none;
-  padding: 8px 12px;
+  padding: 10px 8px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-md);
   font-weight: 500;
@@ -64,6 +64,7 @@
 
 .app__navLink:hover {
   color: var(--color-ink);
+  background: rgba(255, 252, 247, 0.45);
 }
 
 .app__navLink.active {
@@ -72,19 +73,27 @@
   box-shadow: var(--shadow-sm);
 }
 
+.app__navBadge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-terracotta);
+  color: var(--color-ivory);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.app__sidebarFoot {
+  margin-top: auto;
+  position: relative;
+  padding: 0 4px;
+}
+
 .app__bottomNav {
   display: none;
-}
-
-.app__userSection {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-shrink: 0;
-}
-
-.app__desktopProfile {
-  position: relative;
 }
 
 .app__userPill {
@@ -92,21 +101,17 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  width: 100%;
   padding: 4px 10px 4px 4px;
-  border: 1px solid var(--color-line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  flex-shrink: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  transition:
-    border-color var(--ease),
-    background var(--ease);
   font-family: inherit;
 }
 
 .app__userPill:hover,
 .app__userPill--open {
-  border-color: var(--color-moss);
+  color: var(--color-charcoal);
 }
 
 .app__desktopProfileBadge {
@@ -117,7 +122,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-terracotta);
-  border: 1.5px solid var(--color-surface);
+  border: 1.5px solid #ece6d8;
 }
 
 .app__userAvatar {
@@ -130,7 +135,6 @@
   color: var(--color-ivory);
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.02em;
   flex-shrink: 0;
 }
 
@@ -138,7 +142,6 @@
   font-size: var(--fs-sm);
   font-weight: 500;
   color: var(--color-ink);
-  max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -152,10 +155,10 @@
 
 .app__desktopUserMenu {
   position: absolute;
-  top: calc(100% + var(--space-2));
+  left: 0;
   right: 0;
+  bottom: calc(100% + 8px);
   z-index: 100;
-  min-width: 200px;
   background: var(--color-surface);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
@@ -175,55 +178,34 @@
   margin-bottom: var(--space-1);
 }
 
-.app__userMenuLink {
+.app__userMenuLink,
+.app__userMenuLogout {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
   width: 100%;
   padding: 9px 10px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-md);
   font-weight: 500;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.app__userMenuLink {
   color: var(--color-ink);
   text-decoration: none;
-  transition: background var(--ease);
-  box-sizing: border-box;
 }
 
 .app__userMenuLink:hover {
   background: var(--color-ivory);
 }
 
-.app__userMenuBadge {
-  display: inline-grid;
-  place-items: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 50%;
-  background: var(--color-terracotta);
-  color: var(--color-ivory);
-  font-size: 11px;
-  font-weight: 600;
-  margin-left: auto;
-}
-
 .app__userMenuLogout {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  padding: 9px 10px;
   border: none;
   background: none;
-  border-radius: var(--radius-sm);
-  font-size: var(--fs-md);
-  font-weight: 500;
   color: var(--color-terracotta);
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--ease);
-  font-family: inherit;
 }
 
 .app__userMenuLogout:hover {
@@ -231,7 +213,7 @@
 }
 
 .app__main {
-  padding-top: var(--header-height);
+  min-width: 0;
   min-height: 100dvh;
 }
 
@@ -239,17 +221,16 @@
   padding-top: 0;
 }
 
-@media (max-width: 768px) {
-  .app__header {
-    display: none;
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: 1fr;
   }
 
-  .app__nav {
+  .app__sidebar {
     display: none;
   }
 
   .app__main {
-    padding-top: 0;
     padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
   }
 
@@ -271,7 +252,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 4px;
+    min-height: 48px;
+    padding: 12px 4px;
     text-decoration: none;
     color: var(--color-faint);
     font-size: 11px;

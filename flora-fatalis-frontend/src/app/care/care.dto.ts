@@ -21,6 +21,7 @@ export interface PrunePlantRequest {
 export interface DashboardItemDto {
   plantId: string;
   plantName: string;
+  locationName?: string | null;
   careType: 'WATERING' | 'FERTILIZING';
   dueOn: string;
   overdueDays: number;
