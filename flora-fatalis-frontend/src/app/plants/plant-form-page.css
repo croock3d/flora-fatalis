@@ -1,0 +1,96 @@
+.form {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.form__back {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.form__title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #14532d;
+}
+
+.form__error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.form__muted {
+  color: #6b7280;
+}
+
+.form__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form__label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form__input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+.form__submit {
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: #166534;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form__submit:disabled {
+  opacity: 0.6;
+}
+
+.form__watering {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form__hint {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.form__clear {
+  align-self: flex-start;
+  height: 36px;
+  padding: 0 12px;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #166534;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}

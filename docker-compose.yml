@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: flora_fatalis
+      POSTGRES_USER: postgress
+      POSTGRES_PASSWORD: postgress
+    volumes:
+      - flora_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgress -d flora_fatalis"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGDATABASE: flora_fatalis
+      PGUSER: postgress
+      PGPASSWORD: postgress
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      PHOTOS_DIR: /uploads
+      SPRING_LIQUIBASE_CONTEXTS: dev
+    volumes:
+      - flora_uploads:/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  flora_pg:
+  flora_uploads:

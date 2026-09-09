@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-households
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: households
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: inviter_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: invitee_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: accepted_at
+                  type: timestamptz
+        - createIndex:
+            indexName: idx_households_inviter
+            tableName: households
+            columns:
+              - column:
+                  name: inviter_id
+        - createIndex:
+            indexName: idx_households_invitee
+            tableName: households
+            columns:
+              - column:
+                  name: invitee_id

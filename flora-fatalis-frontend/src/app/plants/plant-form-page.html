@@ -1,0 +1,63 @@
+<section class="form">
+  <a class="form__back" routerLink="/plants">← Rośliny</a>
+  <h1 class="form__title">{{ isEdit ? 'Edytuj roślinę' : 'Dodaj roślinę' }}</h1>
+
+  @if (error()) {
+    <div class="form__error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="form__muted">Ładowanie...</p>
+  } @else {
+    <form class="form__body" [formGroup]="form" (ngSubmit)="save()">
+      <label class="form__label">
+        Nazwa
+        <input class="form__input" type="text" formControlName="name" />
+      </label>
+      <label class="form__label">
+        Gatunek
+        <select class="form__input" formControlName="speciesId">
+          <option value="" disabled>Wybierz gatunek</option>
+          @for (item of species(); track item.id) {
+            <option [value]="item.id">
+              {{ item.name }}{{ item.latinName ? ' (' + item.latinName + ')' : '' }}
+            </option>
+          }
+        </select>
+      </label>
+      <label class="form__label">
+        Lokalizacja
+        <select class="form__input" formControlName="locationId">
+          <option value="" disabled>Wybierz lokalizację</option>
+          @for (item of locations(); track item.id) {
+            <option [value]="item.id">{{ item.name }}</option>
+          }
+        </select>
+      </label>
+      <div class="form__watering">
+        <p class="form__hint">
+          Domyślnie dla gatunku:
+          {{ selectedSpeciesInterval() ? selectedSpeciesInterval() + ' dni' : 'wybierz gatunek' }}
+        </p>
+        <label class="form__label">
+          Dla tej rośliny (dni)
+          <input
+            class="form__input"
+            type="number"
+            min="1"
+            formControlName="wateringIntervalDaysOverride"
+            placeholder="zostaw puste, aby użyć wartości gatunku"
+          />
+        </label>
+        @if (form.controls.wateringIntervalDaysOverride.value) {
+          <button class="form__clear" type="button" (click)="clearOverride()">
+            Wróć do wartości gatunku
+          </button>
+        }
+      </div>
+      <button class="form__submit" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Zapisywanie...' : 'Zapisz' }}
+      </button>
+    </form>
+  }
+</section>

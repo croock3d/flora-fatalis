@@ -1,0 +1,34 @@
+<section class="catalog">
+  <h1 class="catalog__title">Gatunki</h1>
+  <p class="catalog__hint">Katalog gatunków używany przy dodawaniu roślin i podlewaniu.</p>
+
+  @if (error()) {
+    <div class="catalog__error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="catalog__muted">Ładowanie...</p>
+  } @else {
+    <ul class="catalog__list">
+      @for (item of species(); track item.id) {
+        <li class="catalog__item">
+          <div>
+            <p class="catalog__name">{{ item.name }}</p>
+            @if (item.latinName) {
+              <p class="catalog__latin">{{ item.latinName }}</p>
+            }
+            <p class="catalog__meta">
+              @if (item.category) {
+                <span>{{ categoryLabel(item.category) }}</span>
+              }
+              @if (item.lightPreference) {
+                <span>{{ item.lightPreference }}</span>
+              }
+            </p>
+          </div>
+          <span class="catalog__interval">{{ item.wateringIntervalLabel || ('co ' + item.defaultWateringIntervalDays + ' dni') }}</span>
+        </li>
+      }
+    </ul>
+  }
+</section>

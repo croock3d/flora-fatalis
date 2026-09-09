@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-plants
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: plants
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: household_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: species_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: location_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(80)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: watering_interval_days_override
+                  type: int
+              - column:
+                  name: acquired_at
+                  type: timestamptz
+              - column:
+                  name: archived_at
+                  type: timestamptz
+              - column:
+                  name: created_by
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_plants_household_active
+            tableName: plants
+            columns:
+              - column:
+                  name: household_id
+              - column:
+                  name: archived_at

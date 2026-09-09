@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-multi-household-membership
+      author: flora-fatalis
+      validCheckSum: 9:f222ef134ad5e35ffe804000480bfd39
+      changes:
+        - addColumn:
+            tableName: user_accounts
+            columns:
+              - column:
+                  name: active_household_id
+                  type: uuid
+        - sql:
+            sql: >
+              UPDATE user_accounts ua
+              SET active_household_id = (
+                SELECT h.id FROM households h WHERE h.owner_id = ua.id LIMIT 1
+              )
+              WHERE active_household_id IS NULL;
+              UPDATE user_accounts ua
+              SET active_household_id = (
+                SELECT h.id FROM households h WHERE h.partner_id = ua.id LIMIT 1
+              )
+              WHERE active_household_id IS NULL
+        - createIndex:
+            indexName: idx_user_accounts_active_household
+            tableName: user_accounts
+            columns:
+              - column:
+                  name: active_household_id

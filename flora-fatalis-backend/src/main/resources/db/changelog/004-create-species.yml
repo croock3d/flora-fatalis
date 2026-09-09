@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-species
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: species
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: latin_name
+                  type: varchar(160)
+              - column:
+                  name: default_watering_interval_days
+                  type: int
+                  constraints:
+                    nullable: false
+        - insert:
+            tableName: species
+            columns:
+              - column:
+                  name: id
+                  value: '00000000-0000-0000-0000-000000000010'
+              - column:
+                  name: name
+                  value: 'Inny'
+              - column:
+                  name: latin_name
+                  value: null
+              - column:
+                  name: default_watering_interval_days
+                  valueNumeric: 7

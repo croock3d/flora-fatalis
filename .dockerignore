@@ -1,0 +1,11 @@
+.git
+.idea
+**/.angular
+**/node_modules
+**/dist
+**/target
+**/uploads
+**/.DS_Store
+**/*.iml
+flora-fatalis-backend/.mvn
+flora-fatalis-frontend/.vscode

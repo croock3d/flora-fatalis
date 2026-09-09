@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed-dev-user
+      author: flora-fatalis
+      context: dev
+      changes:
+        - insert:
+            tableName: user_accounts
+            columns:
+              - column:
+                  name: id
+                  value: '00000000-0000-0000-0000-000000000001'
+              - column:
+                  name: email
+                  value: 'dev@flora-fatalis.local'
+              - column:
+                  name: hashed_password
+                  value: '$2a$10$eG.F2d9Tgu8YV71/0ecQw.BdJEuN76FTjypvM6IXI//tm9uyRq8zu'
+              - column:
+                  name: display_name
+                  value: 'Dev User'
+              - column:
+                  name: created_at
+                  valueDate: 'now()'

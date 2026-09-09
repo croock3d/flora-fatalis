@@ -1,0 +1,32 @@
+<section class="plants">
+  <div class="plants__header">
+    <div>
+      <h1 class="plants__title">Rośliny</h1>
+      <p class="plants__hint">Rejestr roślin gospodarstwa.</p>
+    </div>
+    <a class="plants__add" routerLink="/plants/new">Dodaj roślinę</a>
+  </div>
+
+  @if (error()) {
+    <div class="plants__error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="plants__muted">Ładowanie...</p>
+  } @else if (plants().length === 0) {
+    <p class="plants__muted">Brak roślin. Dodaj pierwszą albo najpierw utwórz lokalizację.</p>
+  } @else {
+    <ul class="plants__list">
+      @for (plant of plants(); track plant.id) {
+        <li>
+          <a class="plants__item" [routerLink]="['/plants', plant.id]">
+            <div>
+              <p class="plants__name">{{ plant.name }}</p>
+              <p class="plants__meta">{{ speciesName(plant.speciesId) }} · {{ locationName(plant.locationId) }}</p>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</section>

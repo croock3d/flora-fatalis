@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-plant-photos
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: plant_photos
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: plant_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: household_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: storage_key
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content_type
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: taken_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_primary
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: int
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_plant_photos_plant
+            tableName: plant_photos
+            columns:
+              - column:
+                  name: plant_id

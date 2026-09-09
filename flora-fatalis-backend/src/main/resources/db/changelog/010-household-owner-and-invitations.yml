@@ -1,0 +1,118 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-household-owner-and-invitations
+      author: flora-fatalis
+      changes:
+        - addColumn:
+            tableName: households
+            columns:
+              - column:
+                  name: owner_id
+                  type: uuid
+        - addColumn:
+            tableName: households
+            columns:
+              - column:
+                  name: partner_id
+                  type: uuid
+        - sql:
+            sql: >
+              UPDATE households
+              SET owner_id = inviter_id,
+                  partner_id = CASE WHEN status = 'ACTIVE' THEN invitee_id ELSE NULL END
+        - addNotNullConstraint:
+            tableName: households
+            columnName: owner_id
+            columnDataType: uuid
+        - dropNotNullConstraint:
+            tableName: households
+            columnName: invitee_id
+            columnDataType: uuid
+        - dropNotNullConstraint:
+            tableName: households
+            columnName: inviter_id
+            columnDataType: uuid
+        - dropNotNullConstraint:
+            tableName: households
+            columnName: status
+            columnDataType: varchar(16)
+        - createTable:
+            tableName: household_invitations
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: household_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: inviter_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: invitee_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+        - sql:
+            sql: >
+              INSERT INTO household_invitations (id, household_id, inviter_id, invitee_id, created_at)
+              SELECT gen_random_uuid(), id, inviter_id, invitee_id, created_at
+              FROM households
+              WHERE status = 'PENDING'
+        - createIndex:
+            indexName: idx_households_partner
+            tableName: households
+            columns:
+              - column:
+                  name: partner_id
+        - addUniqueConstraint:
+            tableName: household_invitations
+            columnNames: household_id
+            constraintName: uk_household_invitations_household
+        - addUniqueConstraint:
+            tableName: household_invitations
+            columnNames: invitee_id
+            constraintName: uk_household_invitations_invitee
+        - addUniqueConstraint:
+            tableName: households
+            columnNames: owner_id
+            constraintName: uk_households_owner
+        - dropIndex:
+            indexName: idx_households_inviter
+            tableName: households
+        - dropIndex:
+            indexName: idx_households_invitee
+            tableName: households
+        - dropColumn:
+            tableName: households
+            columnName: inviter_id
+        - dropColumn:
+            tableName: households
+            columnName: invitee_id
+        - dropColumn:
+            tableName: households
+            columnName: status
+        - dropColumn:
+            tableName: households
+            columnName: accepted_at
+        - sql:
+            sql: >
+              INSERT INTO households (id, owner_id, partner_id, created_at)
+              SELECT gen_random_uuid(), ua.id, NULL, ua.created_at
+              FROM user_accounts ua
+              WHERE NOT EXISTS (
+                SELECT 1 FROM households h
+                WHERE h.owner_id = ua.id OR h.partner_id = ua.id
+              )

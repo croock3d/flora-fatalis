@@ -1,0 +1,58 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-extend-species-catalog-columns
+      author: flora-fatalis
+      changes:
+        - addColumn:
+            tableName: species
+            columns:
+              - column:
+                  name: watering_interval_min_days
+                  type: int
+              - column:
+                  name: watering_interval_max_days
+                  type: int
+              - column:
+                  name: watering_interval_label
+                  type: varchar(40)
+              - column:
+                  name: light_preference
+                  type: varchar(80)
+              - column:
+                  name: humidity_preference
+                  type: varchar(80)
+              - column:
+                  name: category
+                  type: varchar(40)
+  - changeSet:
+      id: 009-update-other-species
+      author: flora-fatalis
+      changes:
+        - update:
+            tableName: species
+            columns:
+              - column:
+                  name: watering_interval_min_days
+                  valueNumeric: 7
+              - column:
+                  name: watering_interval_max_days
+                  valueNumeric: 7
+              - column:
+                  name: watering_interval_label
+                  value: '7 dni'
+              - column:
+                  name: category
+                  value: 'inne'
+            where: id = '00000000-0000-0000-0000-000000000010'
+  - changeSet:
+      id: 009-seed-species-catalog
+      author: flora-fatalis
+      changes:
+        - loadUpdateData:
+            tableName: species
+            primaryKey: id
+            relativeToChangelogFile: true
+            file: data/species-catalog.csv
+            encoding: UTF-8
+            separator: ','
+            quotchar: '"'

@@ -1,0 +1,32 @@
+id,name,latin_name,default_watering_interval_days,watering_interval_min_days,watering_interval_max_days,watering_interval_label,light_preference,humidity_preference,category
+00000000-0000-0000-0000-000000000011,Monstera dziurawa,Monstera deliciosa,7,7,10,7–10 dni,jasne rozproszone,średnia/wysoka,domowa
+00000000-0000-0000-0000-000000000012,Monstera adansona,Monstera adansonii,7,7,10,7–10 dni,jasne rozproszone,wysoka,domowa
+00000000-0000-0000-0000-000000000013,Epipremnum złociste,Epipremnum aureum,7,7,10,7–10 dni,rozproszone / półcień,średnia,domowa
+00000000-0000-0000-0000-000000000014,Filodendron pnący,Philodendron hederaceum,7,7,10,7–10 dni,rozproszone,średnia/wysoka,domowa
+00000000-0000-0000-0000-000000000015,Figowiec sprężysty,Ficus elastica,10,10,14,10–14 dni,jasne,średnia,domowa
+00000000-0000-0000-0000-000000000016,Figowiec lirolistny,Ficus lyrata,10,10,14,10–14 dni,jasne,średnia,domowa
+00000000-0000-0000-0000-000000000017,Fikus benjamina,Ficus benjamina,7,7,14,7–14 dni,jasne,średnia,domowa
+00000000-0000-0000-0000-000000000018,Sansewieria,Dracaena trifasciata,14,14,21,14–21 dni,jasne / półcień,niska,domowa
+00000000-0000-0000-0000-000000000019,Zamiokulkas,Zamioculcas zamiifolia,14,14,21,14–21 dni,półcień / jasne,niska,domowa
+00000000-0000-0000-0000-000000000020,Zielistka,Chlorophytum comosum,7,7,10,7–10 dni,jasne / półcień,średnia,domowa
+00000000-0000-0000-0000-000000000021,Skrzydłokwiat,Spathiphyllum,5,5,7,5–7 dni,rozproszone,wysoka,domowa
+00000000-0000-0000-0000-000000000022,Kalatea,Calathea spp.,4,4,7,4–7 dni,rozproszone,wysoka,domowa
+00000000-0000-0000-0000-000000000023,Maranta,Maranta leuconeura,4,4,7,4–7 dni,rozproszone,wysoka,domowa
+00000000-0000-0000-0000-000000000024,Syngonium,Syngonium podophyllum,7,7,10,7–10 dni,rozproszone,średnia/wysoka,domowa
+00000000-0000-0000-0000-000000000025,Szeflera,Schefflera arboricola,7,7,10,7–10 dni,jasne,średnia,domowa
+00000000-0000-0000-0000-000000000026,Grubosz jajowaty,Crassula ovata,14,14,21,14–21 dni,bardzo jasne,niska,domowa
+00000000-0000-0000-0000-000000000027,Aloes,Aloe vera,14,14,21,14–21 dni,bardzo jasne,niska,domowa
+00000000-0000-0000-0000-000000000028,Haworsja,Haworthiopsis attenuata,14,14,21,14–21 dni,bardzo jasne,niska,domowa
+00000000-0000-0000-0000-000000000029,Rozchodnik Morgana,Sedum morganianum,14,14,21,14–21 dni,bardzo jasne,niska,domowa
+00000000-0000-0000-0000-000000000030,Palma areka,Dypsis lutescens,5,5,7,5–7 dni,jasne rozproszone,wysoka,domowa
+00000000-0000-0000-0000-000000000031,Mięta,Mentha spp.,2,2,4,2–4 dni,jasne,średnia/wysoka,zioła
+00000000-0000-0000-0000-000000000032,Bazylia,Ocimum basilicum,1,1,3,1–3 dni,bardzo jasne,średnia,zioła
+00000000-0000-0000-0000-000000000033,Rozmaryn,Rosmarinus officinalis,5,5,10,5–10 dni,bardzo jasne,niska/średnia,zioła
+00000000-0000-0000-0000-000000000034,Tymianek,Thymus vulgaris,5,5,10,5–10 dni,bardzo jasne,niska,zioła
+00000000-0000-0000-0000-000000000035,Pietruszka,Petroselinum crispum,3,3,5,3–5 dni,jasne,średnia,zioła
+00000000-0000-0000-0000-000000000036,Pelargonia,Pelargonium spp.,2,2,4,2–4 dni,pełne słońce,średnia,balkonowe
+00000000-0000-0000-0000-000000000037,Petunia,Petunia x hybrida,1,1,3,1–3 dni,pełne słońce,średnia,balkonowe
+00000000-0000-0000-0000-000000000038,Surfinia,Surfinia,1,1,2,1–2 dni,pełne słońce,średnia,balkonowe
+00000000-0000-0000-0000-000000000039,Lawenda,Lavandula angustifolia,4,4,7,4–7 dni,pełne słońce,niska,balkonowe
+00000000-0000-0000-0000-000000000040,Pomidor,Solanum lycopersicum,1,1,2,1–2 dni,pełne słońce,średnia,balkonowe
+00000000-0000-0000-0000-000000000041,Papryka,Capsicum annuum,2,2,4,2–4 dni,pełne słońce,średnia,balkonowe

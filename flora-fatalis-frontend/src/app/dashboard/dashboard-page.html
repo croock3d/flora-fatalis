@@ -1,0 +1,116 @@
+<section class="dash">
+  <h1 class="dash__title">Dzisiaj</h1>
+
+  @if (error()) {
+    <div class="dash__error" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <p class="dash__muted">Ładowanie...</p>
+  } @else if (dashboard(); as data) {
+    <section class="dash__section">
+      <h2>Zaległe</h2>
+      @if (data.overdue.length === 0) {
+        <p class="dash__muted">Brak zaległości.</p>
+      } @else {
+        <ul>
+          @for (item of data.overdue; track item.plantId) {
+            <li>
+              <a [routerLink]="['/plants', item.plantId]">
+                {{ item.plantName }}
+                <span>{{ overdueLabel(item.overdueDays) }}</span>
+              </a>
+              <div class="dash__water">
+                <input
+                  class="dash__ml"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  placeholder="ml"
+                  [ngModel]="quantityFor(item.plantId)"
+                  (ngModelChange)="setQuantity(item.plantId, $event)"
+                />
+                <button
+                  type="button"
+                  [disabled]="wateringPlantId() === item.plantId"
+                  (click)="water(item)"
+                >
+                  {{ wateringPlantId() === item.plantId ? '...' : 'Podlej' }}
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="dash__section">
+      <h2>Dzisiaj</h2>
+      @if (data.dueToday.length === 0) {
+        <p class="dash__muted">Nic na dzisiaj.</p>
+      } @else {
+        <ul>
+          @for (item of data.dueToday; track item.plantId) {
+            <li>
+              <a [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
+              <div class="dash__water">
+                <input
+                  class="dash__ml"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  placeholder="ml"
+                  [ngModel]="quantityFor(item.plantId)"
+                  (ngModelChange)="setQuantity(item.plantId, $event)"
+                />
+                <button
+                  type="button"
+                  [disabled]="wateringPlantId() === item.plantId"
+                  (click)="water(item)"
+                >
+                  {{ wateringPlantId() === item.plantId ? '...' : 'Podlej' }}
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section class="dash__section">
+      <h2>Najbliższe 7 dni</h2>
+      @if (data.upcoming.length === 0) {
+        <p class="dash__muted">Brak zaplanowanych podlewań.</p>
+      } @else {
+        <ul>
+          @for (item of data.upcoming; track item.plantId) {
+            <li>
+              <a [routerLink]="['/plants', item.plantId]">
+                {{ item.plantName }}
+                <span>{{ item.dueOn | date: 'dd.MM.yyyy' }}</span>
+              </a>
+              <div class="dash__water">
+                <input
+                  class="dash__ml"
+                  type="number"
+                  min="1"
+                  inputmode="numeric"
+                  placeholder="ml"
+                  [ngModel]="quantityFor(item.plantId)"
+                  (ngModelChange)="setQuantity(item.plantId, $event)"
+                />
+                <button
+                  type="button"
+                  [disabled]="wateringPlantId() === item.plantId"
+                  (click)="water(item)"
+                >
+                  {{ wateringPlantId() === item.plantId ? '...' : 'Podlej' }}
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</section>

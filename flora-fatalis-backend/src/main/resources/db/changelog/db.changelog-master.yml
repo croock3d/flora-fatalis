@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/000-baseline.yml
+  - include:
+      file: db/changelog/001-create-user-accounts.yml
+  - include:
+      file: db/changelog/002-seed-dev-user.yml
+  - include:
+      file: db/changelog/003-create-households.yml
+  - include:
+      file: db/changelog/004-create-species.yml
+  - include:
+      file: db/changelog/005-create-locations.yml
+  - include:
+      file: db/changelog/006-create-plants.yml
+  - include:
+      file: db/changelog/007-create-plant-photos.yml
+  - include:
+      file: db/changelog/008-create-care-events.yml
+  - include:
+      file: db/changelog/009-seed-species-catalog.yml
+  - include:
+      file: db/changelog/010-household-owner-and-invitations.yml
+  - include:
+      file: db/changelog/011-multi-household-membership.yml

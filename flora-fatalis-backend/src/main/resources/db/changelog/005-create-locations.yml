@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-locations
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: locations
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: household_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(80)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: kind
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: idx_locations_household
+            tableName: locations
+            columns:
+              - column:
+                  name: household_id

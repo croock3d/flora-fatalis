@@ -1,0 +1,96 @@
+<app-auth-card subtitle="Utwórz nowe konto">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    @if (errorMessage()) {
+      <div class="auth-form__error-banner">{{ errorMessage() }}</div>
+    }
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="displayName">Imię i nazwisko</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('displayName')"
+        id="displayName"
+        type="text"
+        formControlName="displayName"
+        placeholder="Jan Kowalski"
+        autocomplete="name"
+      />
+      @if (isFieldInvalid('displayName')) {
+        <span class="auth-form__field-error">
+          @if (form.get('displayName')?.hasError('required')) { Podaj swoje imię. }
+          @else if (form.get('displayName')?.hasError('minlength')) { Imię musi mieć co najmniej 2 znaki. }
+        </span>
+      }
+    </div>
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="email">Email</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('email')"
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="jan@example.com"
+        autocomplete="email"
+      />
+      @if (isFieldInvalid('email')) {
+        <span class="auth-form__field-error">
+          @if (form.get('email')?.hasError('required')) { Podaj adres email. }
+          @else if (form.get('email')?.hasError('email')) { Podaj prawidłowy adres email. }
+        </span>
+      }
+    </div>
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="password">Hasło</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('password')"
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+      />
+      @if (isFieldInvalid('password')) {
+        <span class="auth-form__field-error">
+          @if (form.get('password')?.hasError('required')) { Podaj hasło. }
+          @else if (form.get('password')?.hasError('minlength')) { Hasło musi mieć co najmniej 6 znaków. }
+        </span>
+      }
+    </div>
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="confirmPassword">Powtórz hasło</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('confirmPassword') || passwordsMismatch"
+        id="confirmPassword"
+        type="password"
+        formControlName="confirmPassword"
+        placeholder="••••••••"
+        autocomplete="new-password"
+      />
+      @if (isFieldInvalid('confirmPassword') && form.get('confirmPassword')?.hasError('required')) {
+        <span class="auth-form__field-error">Powtórz hasło.</span>
+      } @else if (passwordsMismatch) {
+        <span class="auth-form__field-error">Hasła nie są identyczne.</span>
+      }
+    </div>
+
+    <button class="auth-form__submit" type="submit" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <span class="auth-form__spinner"></span>
+        Rejestracja...
+      } @else {
+        Zarejestruj się
+      }
+    </button>
+  </form>
+
+  <p class="auth-card__footer">
+    Masz już konto?
+    <a routerLink="/login" class="auth-card__link">Zaloguj się</a>
+  </p>
+</app-auth-card>

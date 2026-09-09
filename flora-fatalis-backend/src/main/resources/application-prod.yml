@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+  liquibase:
+    contexts: prod
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  photos:
+    dir: ${PHOTOS_DIR:uploads}

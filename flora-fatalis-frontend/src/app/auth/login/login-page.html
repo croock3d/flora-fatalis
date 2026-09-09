@@ -1,0 +1,68 @@
+<app-auth-card subtitle="Zaloguj się do swojego konta">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    @if (errorMessage()) {
+      <div class="auth-form__error-banner">{{ errorMessage() }}</div>
+    }
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="email">Email</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('email')"
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="jan@example.com"
+        autocomplete="email"
+      />
+      @if (isFieldInvalid('email')) {
+        <span class="auth-form__field-error">
+          @if (form.get('email')?.hasError('required')) { Podaj adres email. }
+          @else if (form.get('email')?.hasError('email')) { Podaj prawidłowy adres email. }
+        </span>
+      }
+    </div>
+
+    <div class="auth-form__field">
+      <label class="auth-form__label" for="password">Hasło</label>
+      <input
+        class="auth-form__input"
+        [class.auth-form__input--invalid]="isFieldInvalid('password')"
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="••••••••"
+        autocomplete="current-password"
+      />
+      @if (isFieldInvalid('password')) {
+        <span class="auth-form__field-error">
+          @if (form.get('password')?.hasError('required')) { Podaj hasło. }
+          @else if (form.get('password')?.hasError('minlength')) { Hasło musi mieć co najmniej 6 znaków. }
+        </span>
+      }
+    </div>
+
+    <button class="auth-form__submit" type="submit" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <span class="auth-form__spinner"></span>
+        Logowanie...
+      } @else {
+        Zaloguj się
+      }
+    </button>
+  </form>
+
+  <p class="auth-card__footer">
+    Nie masz konta?
+    <a routerLink="/register" class="auth-card__link">Zarejestruj się</a>
+  </p>
+
+  @if (isDev) {
+    <div class="dev-toolbar">
+      <button class="dev-toolbar__btn" type="button" (click)="loginAsDev()">
+        <span>⚙</span>
+        Dev Login
+      </button>
+    </div>
+  }
+</app-auth-card>

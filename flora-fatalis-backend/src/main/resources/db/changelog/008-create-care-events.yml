@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-care-events
+      author: flora-fatalis
+      changes:
+        - createTable:
+            tableName: care_events
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: plant_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: household_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: care_type
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: performed_at
+                  type: timestamptz
+                  constraints:
+                    nullable: false
+              - column:
+                  name: performed_by
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity_ml
+                  type: int
+              - column:
+                  name: source
+                  type: varchar(16)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notes
+                  type: varchar(500)
+        - createIndex:
+            indexName: idx_care_events_plant_type_time
+            tableName: care_events
+            columns:
+              - column:
+                  name: plant_id
+              - column:
+                  name: care_type
+              - column:
+                  name: performed_at
