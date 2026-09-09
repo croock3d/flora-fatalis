@@ -1,11 +1,11 @@
 <section class="plants">
-  <div class="plants__header">
+  <header class="plants__header">
     <div>
+      <p class="plants__kicker">Gospodarstwo</p>
       <h1 class="plants__title">Rośliny</h1>
-      <p class="plants__hint">Rejestr roślin gospodarstwa.</p>
     </div>
-    <a class="plants__add" routerLink="/plants/new">Dodaj roślinę</a>
-  </div>
+    <a class="btn" routerLink="/plants/new">Dodaj roślinę</a>
+  </header>
 
   @if (error()) {
     <div class="plants__error" role="alert">{{ error() }}</div>
@@ -20,10 +20,13 @@
       @for (plant of plants(); track plant.id) {
         <li>
           <a class="plants__item" [routerLink]="['/plants', plant.id]">
-            <div>
-              <p class="plants__name">{{ plant.name }}</p>
-              <p class="plants__meta">{{ speciesName(plant.speciesId) }} · {{ locationName(plant.locationId) }}</p>
-            </div>
+            <p class="plants__name">{{ plant.name }}</p>
+            @if (speciesLatin(plant.speciesId); as latin) {
+              <p class="plants__latin">{{ latin }}</p>
+            } @else {
+              <p class="plants__meta">{{ speciesName(plant.speciesId) }}</p>
+            }
+            <p class="plants__meta">{{ locationName(plant.locationId) }}</p>
           </a>
         </li>
       }

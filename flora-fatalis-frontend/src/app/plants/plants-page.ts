@@ -54,6 +54,10 @@ export class PlantsPage {
     return this.species().find((item) => item.id === id)?.name ?? 'Nieznany gatunek';
   }
 
+  protected speciesLatin(id: string): string | null {
+    return this.species().find((item) => item.id === id)?.latinName ?? null;
+  }
+
   protected locationName(id: string): string {
     return this.locations().find((item) => item.id === id)?.name ?? 'Nieznana lokalizacja';
   }
