@@ -55,6 +55,11 @@ export class PlantDetailsPage {
   protected readonly prunePerformedOn = signal(this.todayInWarsaw());
   protected readonly pruneKind = signal<PruningKind | ''>('');
   protected readonly pruneNotes = signal('');
+  protected readonly confirmingArchive = signal(false);
+  protected readonly pendingDeleteId = signal<string | null>(null);
+  protected readonly primaryPhoto = computed(
+    () => this.photos().find((photo) => photo.primary) ?? this.photos()[0] ?? null,
+  );
   protected readonly pruneKinds: { value: PruningKind; label: string }[] = [
     { value: 'DRY_LEAVES', label: 'Suche/uszkodzone liście' },
     { value: 'SHAPING', label: 'Formowanie' },
@@ -64,6 +69,14 @@ export class PlantDetailsPage {
 
   constructor() {
     this.reload();
+  }
+
+  protected askArchive(): void {
+    this.confirmingArchive.set(true);
+  }
+
+  protected cancelArchive(): void {
+    this.confirmingArchive.set(false);
   }
 
   protected archive(): void {
@@ -170,8 +183,17 @@ export class PlantDetailsPage {
     return this.pruneKinds.find((item) => item.value === kind)?.label ?? '';
   }
 
+  protected askDeleteEvent(event: PlantHistoryItemDto): void {
+    this.pendingDeleteId.set(event.sourceId);
+  }
+
+  protected cancelDeleteEvent(): void {
+    this.pendingDeleteId.set(null);
+  }
+
   protected deleteEvent(event: PlantHistoryItemDto): void {
     this.deletingEventId.set(event.sourceId);
+    this.pendingDeleteId.set(null);
     this.careApi.deleteEvent(event.sourceId).subscribe({
       next: () => {
         this.deletingEventId.set(null);
@@ -263,11 +285,80 @@ export class PlantDetailsPage {
 
   protected careDate(iso: string | null | undefined): string {
     if (!iso) return 'brak';
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T12:00:00` : iso;
     return new Intl.DateTimeFormat('pl-PL', {
       day: 'numeric',
       month: 'long',
       timeZone: 'Europe/Warsaw',
-    }).format(new Date(iso));
+    }).format(new Date(date));
+  }
+
+  protected daysFromToday(iso: string | null | undefined): number | null {
+    if (!iso) return null;
+    const today = this.todayInWarsaw();
+    const target = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso : this.dayKey(iso);
+    const todayMs = Date.parse(`${today}T12:00:00`);
+    const targetMs = Date.parse(`${target}T12:00:00`);
+    return Math.round((targetMs - todayMs) / 86_400_000);
+  }
+
+  protected overdueLabel(days: number): string {
+    const overdue = Math.abs(days);
+    if (overdue === 1) return '1 dzień zaległości';
+    return `${overdue} dni zaległości`;
+  }
+
+  protected wateringDue(): boolean {
+    const days = this.daysFromToday(this.careStatus()?.watering.nextOn);
+    return days != null && days <= 0;
+  }
+
+  protected statusTone(): 'overdue' | 'today' | 'ok' {
+    const watering = this.daysFromToday(this.careStatus()?.watering.nextOn);
+    const fertilizing = this.daysFromToday(this.careStatus()?.fertilizing?.nextOn);
+    if ((watering != null && watering < 0) || (fertilizing != null && fertilizing < 0)) {
+      return 'overdue';
+    }
+    if (watering === 0 || fertilizing === 0) {
+      return 'today';
+    }
+    return 'ok';
+  }
+
+  protected statusLine(): string {
+    const watering = this.daysFromToday(this.careStatus()?.watering.nextOn);
+    const fertilizing = this.daysFromToday(this.careStatus()?.fertilizing?.nextOn);
+    if (watering != null && watering < 0) {
+      return `Podlej · ${this.overdueLabel(watering)}`;
+    }
+    if (watering === 0) {
+      return 'Podlej · dzisiaj';
+    }
+    if (fertilizing != null && fertilizing < 0) {
+      return `Nawieź · ${this.overdueLabel(fertilizing)}`;
+    }
+    if (fertilizing === 0) {
+      return 'Nawieź · dzisiaj';
+    }
+    if (this.careStatus()?.watering.nextOn) {
+      return `Następne podlewanie · ${this.careDate(this.careStatus()?.watering.nextOn)}`;
+    }
+    return 'Brak zaplanowanego podlewania';
+  }
+
+  protected eventTitle(type: PlantHistoryItemDto['type']): string {
+    switch (type) {
+      case 'WATERING':
+        return 'Podlano';
+      case 'FERTILIZING':
+        return 'Nawożono';
+      case 'PRUNING':
+        return 'Przycinanie';
+      case 'PHOTO':
+        return 'Zdjęcie';
+      default:
+        return 'Dodano roślinę';
+    }
   }
 
   protected eventTime(iso: string): string {

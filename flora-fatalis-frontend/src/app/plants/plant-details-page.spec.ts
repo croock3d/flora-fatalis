@@ -150,10 +150,16 @@ describe('PlantDetailsPage', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const deleteButton = [...(fixture.nativeElement as HTMLElement).querySelectorAll('button')].find(
+    const compiled = fixture.nativeElement as HTMLElement;
+    const deleteButton = [...compiled.querySelectorAll('button')].find(
       (button) => button.textContent?.trim() === 'Usuń',
     );
     deleteButton?.click();
+    fixture.detectChanges();
+    const confirmButton = [...compiled.querySelectorAll('button')].find(
+      (button) => button.textContent?.trim() === 'Potwierdź',
+    );
+    confirmButton?.click();
     await fixture.whenStable();
     fixture.detectChanges();
 

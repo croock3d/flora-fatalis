@@ -8,180 +8,197 @@
   @if (loading()) {
     <p class="details__muted">Ładowanie...</p>
   } @else if (plant(); as current) {
-    <h1 class="details__title">{{ current.name }}</h1>
-    <dl class="details__meta">
-      <div>
-        <dt>Gatunek</dt>
-        <dd>
-          {{ species()?.name }}
-          @if (species()?.latinName) {
-            <span class="details__latin">{{ species()?.latinName }}</span>
-          }
-        </dd>
-      </div>
-      <div>
-        <dt>Lokalizacja</dt>
-        <dd>{{ locationName() }}</dd>
-      </div>
-      <div>
-        <dt>Podlewanie</dt>
-        <dd>
-          Ostatnie: {{ careDate(careStatus()?.watering?.lastAt) }}
-          <br />
-          Następne: {{ careDate(careStatus()?.watering?.nextOn) }}
-        </dd>
-      </div>
-      @if (careStatus()?.fertilizing; as fertilizingStatus) {
-        <div>
-          <dt>Nawożenie</dt>
-          <dd>
-            Ostatnie: {{ careDate(fertilizingStatus.lastAt) }}
-            <br />
-            Następne: {{ careDate(fertilizingStatus.nextOn) }}
-          </dd>
-        </div>
-      }
-      @if (species()?.fertilizingIntervalLabel || species()?.fertilizerType || species()?.fertilizingSeason) {
-        <div>
-          <dt>Pielęgnacja gatunku</dt>
-          <dd>
-            @if (species()?.wateringIntervalLabel) {
-              💧 {{ species()?.wateringIntervalLabel }}
-              <br />
-            }
-            @if (species()?.fertilizingIntervalLabel) {
-              🌿 {{ species()?.fertilizingIntervalLabel }}
-              <br />
-            }
-            @if (species()?.fertilizingSeason) {
-              Sezon: {{ species()?.fertilizingSeason }}
-              <br />
-            }
-            @if (species()?.fertilizerType) {
-              {{ species()?.fertilizerType }}
-              @if (species()?.fertilizerForm) {
-                · {{ species()?.fertilizerForm }}
-              }
-              <br />
-            }
-            @if (species()?.fertilizingNotes) {
-              {{ species()?.fertilizingNotes }}
-              <br />
-            }
-            @if (species()?.fertilizingRestPeriod) {
-              Spoczynek: {{ species()?.fertilizingRestPeriod }}
-            }
-          </dd>
-        </div>
-      }
-    </dl>
-
-    <div class="details__waterBox">
-      <input
-        class="details__ml"
-        type="number"
-        min="1"
-        inputmode="numeric"
-        placeholder="ml (opcjonalnie)"
-        [ngModel]="quantityMl()"
-        (ngModelChange)="setQuantityMl($event)"
-      />
-      <button class="details__water" type="button" [disabled]="watering()" (click)="water()">
-        {{ watering() ? 'Zapisywanie...' : 'Podlej' }}
-      </button>
-    </div>
-    <button
-      class="details__fertilize"
-      type="button"
-      [disabled]="fertilizing()"
-      (click)="fertilize()"
-    >
-      {{ fertilizing() ? 'Zapisywanie...' : '🌿 Nawożono' }}
-    </button>
-    @if (showPruneForm()) {
-      <form class="details__pruneForm" (ngSubmit)="prune()">
-        <label class="details__pruneLabel">
-          Data
-          <input
-            class="details__pruneInput"
-            type="date"
-            [ngModel]="prunePerformedOn()"
-            (ngModelChange)="setPrunePerformedOn($event)"
-            [max]="todayInWarsaw()"
-            name="prunePerformedOn"
-            required
+    <div class="details__hero">
+      <div class="details__photoFrame" [class.details__photoFrame--empty]="!primaryPhoto()">
+        @if (primaryPhoto(); as photo) {
+          <img
+            [src]="photoUrls.objectUrl(photo.url) | async"
+            [alt]="'Zdjęcie: ' + current.name"
           />
-        </label>
-        <label class="details__pruneLabel">
-          Rodzaj
-          <select
-            class="details__pruneInput"
-            [ngModel]="pruneKind()"
-            (ngModelChange)="setPruneKind($event)"
-            name="pruneKind"
-          >
-            <option value="">Bez rodzaju</option>
-            @for (kind of pruneKinds; track kind.value) {
-              <option [value]="kind.value">{{ kind.label }}</option>
-            }
-          </select>
-        </label>
-        <label class="details__pruneLabel">
-          Notatka (opcjonalnie)
-          <textarea
-            class="details__pruneNotes"
-            rows="3"
-            maxlength="500"
-            [ngModel]="pruneNotes()"
-            (ngModelChange)="setPruneNotes($event)"
-            name="pruneNotes"
-          ></textarea>
-        </label>
-        <div class="details__pruneActions">
-          <button class="details__prune" type="submit" [disabled]="pruning()">
-            {{ pruning() ? 'Zapisywanie...' : 'Zapisz przycinanie' }}
-          </button>
-          <button class="details__pruneCancel" type="button" (click)="cancelPruneForm()">
-            Anuluj
-          </button>
-        </div>
-      </form>
-    } @else {
-      <button class="details__prune" type="button" (click)="openPruneForm()">✂️ Przycięto</button>
-    }
-
-    <div class="details__actions">
-      <a class="details__edit" [routerLink]="['/plants', current.id, 'edit']">Edytuj</a>
-      <button class="details__archive" type="button" [disabled]="archiving()" (click)="archive()">
-        {{ archiving() ? 'Archiwizowanie...' : 'Archiwizuj' }}
-      </button>
-    </div>
-
-    <section class="details__block">
-      <h2>Zdjęcia</h2>
-      <label class="details__upload">
-        {{ uploading() ? 'Wysyłanie...' : 'Dodaj zdjęcie' }}
-        <input type="file" accept="image/*" capture="environment" (change)="onFileSelected($event)" />
-      </label>
-      <div class="details__gallery">
-        @for (photo of photos(); track photo.id) {
-          <figure class="details__photo" [class.details__photo--primary]="photo.primary">
-            <img [src]="photoUrls.objectUrl(photo.url) | async" alt="Zdjęcie rośliny" />
-            <figcaption>
-              @if (!photo.primary) {
-                <button type="button" (click)="setPrimary(photo)">Główne</button>
-              } @else {
-                <span>Główne</span>
-              }
-              <button type="button" (click)="deletePhoto(photo)">Usuń</button>
-            </figcaption>
-          </figure>
+        } @else {
+          <label class="details__photoEmpty">
+            Dodaj zdjęcie
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              (change)="onFileSelected($event)"
+            />
+          </label>
         }
       </div>
+
+      <div class="details__identity">
+        <p class="details__kicker">{{ locationName() }}</p>
+        <h1 class="details__title">{{ current.name }}</h1>
+        @if (species()?.latinName) {
+          <p class="details__latin">{{ species()?.latinName }}</p>
+        } @else if (species()?.name) {
+          <p class="details__latin">{{ species()?.name }}</p>
+        }
+        <p class="details__status" [attr.data-tone]="statusTone()">{{ statusLine() }}</p>
+
+        <dl class="details__facts">
+          <div>
+            <dt>Ostatnie podlewanie</dt>
+            <dd>{{ careDate(careStatus()?.watering?.lastAt) }}</dd>
+          </div>
+          <div>
+            <dt>Następne</dt>
+            <dd>{{ careDate(careStatus()?.watering?.nextOn) }}</dd>
+          </div>
+          @if (careStatus()?.fertilizing; as fertilizingStatus) {
+            <div>
+              <dt>Nawożenie</dt>
+              <dd>{{ careDate(fertilizingStatus.nextOn) }}</dd>
+            </div>
+          }
+          @if (species()?.wateringIntervalLabel) {
+            <div>
+              <dt>Interwał</dt>
+              <dd>{{ species()?.wateringIntervalLabel }}</dd>
+            </div>
+          }
+        </dl>
+
+        <div class="details__care" [class.details__care--due]="wateringDue()">
+          <p class="details__careLabel">{{ wateringDue() ? 'Wymagane teraz' : 'Podlewanie' }}</p>
+          <div class="details__careRow">
+            <label class="details__field">
+              <input
+                type="number"
+                min="1"
+                inputmode="numeric"
+                placeholder="—"
+                [ngModel]="quantityMl()"
+                (ngModelChange)="setQuantityMl($event)"
+                aria-label="Ilość wody"
+              />
+              <span>ml</span>
+            </label>
+            <button class="btn" type="button" [disabled]="watering()" (click)="water()">
+              {{ watering() ? 'Zapisywanie...' : 'Podlej' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="details__secondary">
+          <button class="btn btn--ghost" type="button" [disabled]="fertilizing()" (click)="fertilize()">
+            {{ fertilizing() ? 'Zapisywanie...' : 'Nawieź' }}
+          </button>
+          @if (!showPruneForm()) {
+            <button class="btn btn--ghost" type="button" (click)="openPruneForm()">Przycięto</button>
+          }
+          <a class="btn btn--ghost" [routerLink]="['/plants', current.id, 'edit']">Edytuj</a>
+        </div>
+
+        @if (showPruneForm()) {
+          <form class="details__pruneForm" (ngSubmit)="prune()">
+            <label class="details__pruneLabel">
+              Data
+              <input
+                class="details__pruneInput"
+                type="date"
+                [ngModel]="prunePerformedOn()"
+                (ngModelChange)="setPrunePerformedOn($event)"
+                [max]="todayInWarsaw()"
+                name="prunePerformedOn"
+                required
+              />
+            </label>
+            <label class="details__pruneLabel">
+              Rodzaj
+              <select
+                class="details__pruneInput"
+                [ngModel]="pruneKind()"
+                (ngModelChange)="setPruneKind($event)"
+                name="pruneKind"
+              >
+                <option value="">Bez rodzaju</option>
+                @for (kind of pruneKinds; track kind.value) {
+                  <option [value]="kind.value">{{ kind.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="details__pruneLabel">
+              Notatka (opcjonalnie)
+              <textarea
+                class="details__pruneNotes"
+                rows="3"
+                maxlength="500"
+                [ngModel]="pruneNotes()"
+                (ngModelChange)="setPruneNotes($event)"
+                name="pruneNotes"
+              ></textarea>
+            </label>
+            <div class="details__pruneActions">
+              <button class="btn" type="submit" [disabled]="pruning()">
+                {{ pruning() ? 'Zapisywanie...' : 'Zapisz przycinanie' }}
+              </button>
+              <button class="btn btn--ghost" type="button" (click)="cancelPruneForm()">Anuluj</button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+
+    @if (species()?.fertilizingIntervalLabel || species()?.fertilizerType || species()?.fertilizingSeason) {
+      <section class="details__notes">
+        <h2 class="details__sectionLabel">Pielęgnacja gatunku</h2>
+        <p>
+          @if (species()?.fertilizingIntervalLabel) {
+            Nawożenie: {{ species()?.fertilizingIntervalLabel }}.
+          }
+          @if (species()?.fertilizingSeason) {
+            Sezon: {{ species()?.fertilizingSeason }}.
+          }
+          @if (species()?.fertilizerType) {
+            {{ species()?.fertilizerType }}
+            @if (species()?.fertilizerForm) {
+              · {{ species()?.fertilizerForm }}
+            }.
+          }
+          @if (species()?.fertilizingNotes) {
+            {{ species()?.fertilizingNotes }}
+          }
+          @if (species()?.fertilizingRestPeriod) {
+            Spoczynek: {{ species()?.fertilizingRestPeriod }}.
+          }
+        </p>
+      </section>
+    }
+
+    <section class="details__block">
+      <div class="details__sectionHead">
+        <h2 class="details__sectionLabel">Zdjęcia</h2>
+        <label class="details__upload">
+          {{ uploading() ? 'Wysyłanie...' : 'Dodaj' }}
+          <input type="file" accept="image/*" capture="environment" (change)="onFileSelected($event)" />
+        </label>
+      </div>
+      @if (photos().length === 0) {
+        <p class="details__muted">Brak zdjęć.</p>
+      } @else {
+        <div class="details__gallery">
+          @for (photo of photos(); track photo.id) {
+            <figure class="details__thumb" [class.details__thumb--primary]="photo.primary">
+              <img [src]="photoUrls.objectUrl(photo.url) | async" alt="Zdjęcie rośliny" />
+              <figcaption>
+                @if (!photo.primary) {
+                  <button type="button" (click)="setPrimary(photo)">Główne</button>
+                } @else {
+                  <span>Główne</span>
+                }
+                <button type="button" (click)="deletePhoto(photo)">Usuń</button>
+              </figcaption>
+            </figure>
+          }
+        </div>
+      }
     </section>
 
     <section class="details__block">
-      <h2>Historia</h2>
+      <h2 class="details__sectionLabel">Historia</h2>
       @if (history().length === 0) {
         <p class="details__muted">Brak wydarzeń.</p>
       } @else {
@@ -189,22 +206,25 @@
           <h3 class="details__day">{{ day.label }}</h3>
           <ul class="details__timeline">
             @for (event of day.items; track event.type + event.sourceId) {
-              <li class="details__event" [class.details__event--photo]="event.type === 'PHOTO'">
+              <li class="details__event">
                 @if (event.type === 'PHOTO' && event.photoUrl) {
-                  <p class="details__eventTitle">📷 Zdjęcie rośliny</p>
+                  <p class="details__eventTitle">{{ eventTitle(event.type) }}</p>
                   <p class="details__historyMeta">{{ eventTime(event.occurredAt) }}</p>
                   <img
                     class="details__eventPhoto"
                     [src]="photoUrls.objectUrl(event.photoUrl) | async"
                     alt="Zdjęcie z historii rośliny"
                   />
-                } @else if (event.type === 'PRUNING') {
+                } @else {
                   <div class="details__eventRow">
                     <div>
-                      <p class="details__eventTitle">✂️ Przycinanie</p>
+                      <p class="details__eventTitle">{{ eventTitle(event.type) }}</p>
                       <p class="details__historyMeta">
                         {{ eventTime(event.occurredAt) }}
-                        @if (event.pruningKind) {
+                        @if (event.type === 'WATERING' && event.quantityMl) {
+                          · {{ event.quantityMl }} ml
+                        }
+                        @if (event.type === 'PRUNING' && event.pruningKind) {
                           · {{ pruningKindLabel(event.pruningKind) }}
                         }
                         @if (event.performedByName) {
@@ -215,58 +235,29 @@
                         <p class="details__historyMeta">{{ event.notes }}</p>
                       }
                     </div>
-                    <button
-                      type="button"
-                      [disabled]="deletingEventId() === event.sourceId"
-                      (click)="deleteEvent(event)"
-                    >
-                      Usuń
-                    </button>
+                    @if (event.type === 'WATERING' || event.type === 'FERTILIZING' || event.type === 'PRUNING') {
+                      @if (pendingDeleteId() === event.sourceId) {
+                        <div class="details__confirm">
+                          <button
+                            type="button"
+                            [disabled]="deletingEventId() === event.sourceId"
+                            (click)="deleteEvent(event)"
+                          >
+                            Potwierdź
+                          </button>
+                          <button type="button" (click)="cancelDeleteEvent()">Anuluj</button>
+                        </div>
+                      } @else {
+                        <button
+                          type="button"
+                          [disabled]="deletingEventId() === event.sourceId"
+                          (click)="askDeleteEvent(event)"
+                        >
+                          Usuń
+                        </button>
+                      }
+                    }
                   </div>
-                } @else if (event.type === 'FERTILIZING') {
-                  <div class="details__eventRow">
-                    <div>
-                      <p class="details__eventTitle">🌿 Nawożono</p>
-                      <p class="details__historyMeta">
-                        {{ eventTime(event.occurredAt) }}
-                        @if (event.performedByName) {
-                          · {{ event.performedByName }}
-                        }
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      [disabled]="deletingEventId() === event.sourceId"
-                      (click)="deleteEvent(event)"
-                    >
-                      Usuń
-                    </button>
-                  </div>
-                } @else if (event.type === 'WATERING') {
-                  <div class="details__eventRow">
-                    <div>
-                      <p class="details__eventTitle">💧 Podlano</p>
-                      <p class="details__historyMeta">
-                        {{ eventTime(event.occurredAt) }}
-                        @if (event.quantityMl) {
-                          · {{ event.quantityMl }} ml
-                        }
-                        @if (event.performedByName) {
-                          · {{ event.performedByName }}
-                        }
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      [disabled]="deletingEventId() === event.sourceId"
-                      (click)="deleteEvent(event)"
-                    >
-                      Usuń
-                    </button>
-                  </div>
-                } @else {
-                  <p class="details__eventTitle">🌱 Dodano roślinę</p>
-                  <p class="details__historyMeta">{{ eventTime(event.occurredAt) }}</p>
                 }
               </li>
             }
@@ -274,5 +265,19 @@
         }
       }
     </section>
+
+    <footer class="details__footer">
+      @if (confirmingArchive()) {
+        <p class="details__archiveWarn">Archiwizacja jest jednokierunkowa. Roślina zniknie z listy.</p>
+        <button class="btn btn--danger" type="button" [disabled]="archiving()" (click)="archive()">
+          {{ archiving() ? 'Archiwizowanie...' : 'Potwierdź archiwizację' }}
+        </button>
+        <button class="btn btn--ghost" type="button" (click)="cancelArchive()">Anuluj</button>
+      } @else {
+        <button class="details__archiveLink" type="button" [disabled]="archiving()" (click)="askArchive()">
+          Archiwizuj roślinę
+        </button>
+      }
+    </footer>
   }
 </section>
