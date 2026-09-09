@@ -22,6 +22,7 @@ export class HouseholdPage {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly successMessage = signal<string | null>(null);
+  protected readonly pendingLeaveId = signal<string | null>(null);
 
   protected readonly canInvite = computed(() => {
     const owned = this.store.status()?.households.find((household) => household.ownedByMe);
@@ -85,7 +86,16 @@ export class HouseholdPage {
     });
   }
 
+  protected askLeave(householdId: string): void {
+    this.pendingLeaveId.set(householdId);
+  }
+
+  protected cancelLeave(): void {
+    this.pendingLeaveId.set(null);
+  }
+
   protected leave(householdId: string): void {
+    this.pendingLeaveId.set(null);
     this.run(() => this.api.leave(householdId));
   }
 

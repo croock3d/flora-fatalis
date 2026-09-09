@@ -1,6 +1,8 @@
 <section class="catalog">
-  <h1 class="catalog__title">Gatunki</h1>
-  <p class="catalog__hint">Katalog gatunków używany przy dodawaniu roślin i pielęgnacji.</p>
+  <header class="catalog__head">
+    <p class="catalog__kicker">Katalog</p>
+    <h1 class="catalog__title">Gatunki</h1>
+  </header>
 
   @if (error()) {
     <div class="catalog__error" role="alert">{{ error() }}</div>
@@ -12,50 +14,27 @@
     <ul class="catalog__list">
       @for (item of species(); track item.id) {
         <li class="catalog__item">
-          <div>
-            <p class="catalog__name">{{ item.name }}</p>
-            @if (item.latinName) {
-              <p class="catalog__latin">{{ item.latinName }}</p>
+          <p class="catalog__name">{{ item.name }}</p>
+          @if (item.latinName) {
+            <p class="catalog__latin">{{ item.latinName }}</p>
+          }
+          <p class="catalog__meta">
+            @if (item.category) {
+              <span>{{ categoryLabel(item.category) }}</span>
             }
-            <p class="catalog__meta">
-              @if (item.category) {
-                <span>{{ categoryLabel(item.category) }}</span>
-              }
-              @if (item.lightPreference) {
-                <span>{{ item.lightPreference }}</span>
-              }
-              @if (item.humidityPreference) {
-                <span>{{ item.humidityPreference }}</span>
-              }
-            </p>
-            <p class="catalog__care">
-              💧 {{ item.wateringIntervalLabel || ('co ' + item.defaultWateringIntervalDays + ' dni') }}
-            </p>
+            @if (item.lightPreference) {
+              <span>{{ item.lightPreference }}</span>
+            }
+            @if (item.humidityPreference) {
+              <span>{{ item.humidityPreference }}</span>
+            }
+          </p>
+          <p class="catalog__care">
+            Podlewanie {{ item.wateringIntervalLabel || ('co ' + item.defaultWateringIntervalDays + ' dni') }}
             @if (item.fertilizingIntervalLabel || item.defaultFertilizingIntervalDays) {
-              <p class="catalog__care">
-                🌿 {{ item.fertilizingIntervalLabel || ('co ' + item.defaultFertilizingIntervalDays + ' dni') }}
-                @if (item.fertilizingSeason) {
-                  · sezon {{ item.fertilizingSeason }}
-                }
-              </p>
+              · nawożenie {{ item.fertilizingIntervalLabel || ('co ' + item.defaultFertilizingIntervalDays + ' dni') }}
             }
-            @if (item.fertilizerType || item.fertilizerForm) {
-              <p class="catalog__notes">
-                @if (item.fertilizerType) {
-                  {{ item.fertilizerType }}
-                }
-                @if (item.fertilizerForm) {
-                  · {{ item.fertilizerForm }}
-                }
-              </p>
-            }
-            @if (item.fertilizingNotes) {
-              <p class="catalog__notes">{{ item.fertilizingNotes }}</p>
-            }
-            @if (item.fertilizingRestPeriod) {
-              <p class="catalog__notes">Spoczynek: {{ item.fertilizingRestPeriod }}</p>
-            }
-          </div>
+          </p>
         </li>
       }
     </ul>

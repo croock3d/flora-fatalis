@@ -1,60 +1,71 @@
 <section class="locations">
-  <h1 class="locations__title">Lokalizacje</h1>
-  <p class="locations__hint">Miejsca w domu, do których przypiszesz rośliny.</p>
+  <header class="locations__head">
+    <p class="locations__kicker">Gospodarstwo</p>
+    <h1 class="locations__title">Lokalizacje</h1>
+  </header>
 
   @if (error()) {
     <div class="locations__error" role="alert">{{ error() }}</div>
   }
 
   <form class="locations__form" (ngSubmit)="save()">
-    <input
-      class="locations__input"
-      type="text"
-      placeholder="np. Salon"
-      [ngModel]="name()"
-      (ngModelChange)="name.set($event)"
-      name="name"
-      required
-    />
-    <select
-      class="locations__select"
-      [ngModel]="kind()"
-      (ngModelChange)="kind.set($event)"
-      name="kind"
-    >
-      <option value="INDOOR">W domu</option>
-      <option value="BALCONY">Balkon</option>
-      <option value="OUTDOOR">Na zewnątrz</option>
-    </select>
-    <button class="locations__btn locations__btn--primary" type="submit" [disabled]="saving() || !name().trim()">
-      {{ editingId() ? 'Zapisz' : 'Dodaj' }}
-    </button>
-    @if (editingId()) {
-      <button class="locations__btn locations__btn--ghost" type="button" (click)="cancelEdit()">
-        Anuluj
+    <label class="locations__field">
+      <span class="locations__label">{{ editingId() ? 'Edytuj miejsce' : 'Nowe miejsce' }}</span>
+      <input
+        class="locations__input"
+        type="text"
+        placeholder="np. Salon"
+        [ngModel]="name()"
+        (ngModelChange)="name.set($event)"
+        name="name"
+        required
+      />
+    </label>
+    <label class="locations__field locations__field--kind">
+      <span class="locations__label">Rodzaj</span>
+      <select
+        class="locations__input"
+        [ngModel]="kind()"
+        (ngModelChange)="kind.set($event)"
+        name="kind"
+      >
+        <option value="INDOOR">W domu</option>
+        <option value="BALCONY">Balkon</option>
+        <option value="OUTDOOR">Na zewnątrz</option>
+      </select>
+    </label>
+    <div class="locations__formActions">
+      <button class="btn" type="submit" [disabled]="saving() || !name().trim()">
+        {{ editingId() ? 'Zapisz' : 'Dodaj' }}
       </button>
-    }
+      @if (editingId()) {
+        <button class="btn btn--ghost" type="button" (click)="cancelEdit()">Anuluj</button>
+      }
+    </div>
   </form>
 
   @if (loading()) {
     <p class="locations__muted">Ładowanie...</p>
   } @else if (locations().length === 0) {
-    <p class="locations__muted">Brak lokalizacji.</p>
+    <p class="locations__muted">Brak lokalizacji. Dodaj pierwsze miejsce, zanim dodasz roślinę.</p>
   } @else {
     <ul class="locations__list">
       @for (location of locations(); track location.id) {
-        <li class="locations__item">
+        <li class="locations__item" [class.locations__item--editing]="editingId() === location.id">
           <div>
             <p class="locations__name">{{ location.name }}</p>
             <p class="locations__kind">{{ kindLabel(location.kind) }}</p>
           </div>
           <div class="locations__actions">
-            <button class="locations__btn locations__btn--ghost" type="button" (click)="startEdit(location)">
-              Edytuj
-            </button>
-            <button class="locations__btn locations__btn--danger" type="button" (click)="remove(location)">
-              Usuń
-            </button>
+            @if (pendingDeleteId() === location.id) {
+              <button class="locations__danger" type="button" [disabled]="saving()" (click)="remove(location)">
+                Potwierdź
+              </button>
+              <button class="locations__quiet" type="button" (click)="cancelRemove()">Anuluj</button>
+            } @else {
+              <button class="locations__quiet" type="button" (click)="startEdit(location)">Edytuj</button>
+              <button class="locations__danger" type="button" (click)="askRemove(location)">Usuń</button>
+            }
           </div>
         </li>
       }

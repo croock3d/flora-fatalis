@@ -21,6 +21,7 @@ export class LocationsPage {
   protected readonly name = signal('');
   protected readonly kind = signal<LocationKind>('INDOOR');
   protected readonly editingId = signal<string | null>(null);
+  protected readonly pendingDeleteId = signal<string | null>(null);
 
   constructor() {
     this.reload();
@@ -40,8 +41,17 @@ export class LocationsPage {
 
   protected cancelEdit(): void {
     this.editingId.set(null);
+    this.pendingDeleteId.set(null);
     this.name.set('');
     this.kind.set('INDOOR');
+  }
+
+  protected askRemove(location: LocationDto): void {
+    this.pendingDeleteId.set(location.id);
+  }
+
+  protected cancelRemove(): void {
+    this.pendingDeleteId.set(null);
   }
 
   protected save(): void {
@@ -75,6 +85,7 @@ export class LocationsPage {
 
   protected remove(location: LocationDto): void {
     this.saving.set(true);
+    this.pendingDeleteId.set(null);
     this.error.set(null);
     this.api.delete(location.id).subscribe({
       next: () => {

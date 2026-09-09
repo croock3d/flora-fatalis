@@ -1,123 +1,100 @@
-<div class="household">
-  <div class="household__card">
-    <h1 class="household__title">
-      <span class="household__titleIcon">👥</span>
-      Domownicy
-    </h1>
+<section class="household">
+  <header class="household__head">
+    <p class="household__kicker">Gospodarstwo</p>
+    <h1 class="household__title">Domownicy</h1>
+  </header>
 
-    @if (error()) {
-      <div class="household__error" role="alert">{{ error() }}</div>
+  @if (error()) {
+    <div class="household__error" role="alert">{{ error() }}</div>
+  }
+
+  @if (successMessage()) {
+    <p class="household__success" role="status">{{ successMessage() }}</p>
+  }
+
+  @if (!store.loaded()) {
+    <p class="household__muted">Ładowanie...</p>
+  } @else {
+    @if (store.status()?.incomingInvitation; as incoming) {
+      <section class="household__invite household__invite--in">
+        <p class="household__inviteTitle">Zaproszenie</p>
+        <p class="household__inviteText">
+          {{ incoming.partnerDisplayName }} zaprasza Cię do swojego gospodarstwa.
+        </p>
+        <div class="household__inviteActions">
+          <button class="btn" type="button" [disabled]="loading()" (click)="accept()">Akceptuj</button>
+          <button class="btn btn--ghost" type="button" [disabled]="loading()" (click)="reject()">
+            Odrzuć
+          </button>
+        </div>
+      </section>
     }
 
-    @if (successMessage()) {
-      <div class="household__success" role="status">{{ successMessage() }}</div>
-    }
-
-    @if (!store.loaded()) {
-      <div class="household__skeleton">
-        <div class="household__skeletonLine"></div>
-        <div class="household__skeletonLine household__skeletonLine--short"></div>
-      </div>
-    } @else {
-      <p class="household__description">
-        Przełączaj się między swoim gospodarstwem a gospodarstwem partnera.
-      </p>
-
-      <ul class="household__list">
-        @for (household of store.status()?.households ?? []; track household.householdId) {
-          <li class="household__item" [class.household__item--active]="household.active">
-            <div>
-              <p class="household__statusTitle">{{ household.label }}</p>
-              <p class="household__statusDesc">
-                @if (household.ownedByMe) {
-                  Twoje gospodarstwo
-                } @else {
-                  Gospodarstwo partnera
-                }
-                @if (household.hasPartner && household.partnerDisplayName) {
-                  · {{ household.partnerDisplayName }}
-                }
-              </p>
-            </div>
-            <div class="household__itemActions">
-              @if (!household.active) {
-                <button
-                  class="household__btn household__btn--secondary"
-                  type="button"
-                  [disabled]="loading()"
-                  (click)="switchTo(household.householdId)"
-                >
-                  Przełącz
-                </button>
+    <ul class="household__list">
+      @for (household of store.status()?.households ?? []; track household.householdId) {
+        <li class="household__item" [class.household__item--active]="household.active">
+          <div>
+            <p class="household__name">{{ household.label }}</p>
+            <p class="household__meta">
+              @if (household.active) {
+                Aktywne
+              } @else if (household.ownedByMe) {
+                Twoje gospodarstwo
+              } @else {
+                Gospodarstwo partnera
               }
-              @if (!household.ownedByMe) {
+              @if (household.hasPartner && household.partnerDisplayName) {
+                · {{ household.partnerDisplayName }}
+              }
+            </p>
+          </div>
+          <div class="household__actions">
+            @if (!household.active) {
+              <button
+                class="btn"
+                type="button"
+                [disabled]="loading()"
+                (click)="switchTo(household.householdId)"
+              >
+                Przełącz
+              </button>
+            }
+            @if (!household.ownedByMe) {
+              @if (pendingLeaveId() === household.householdId) {
                 <button
-                  class="household__btn household__btn--danger"
+                  class="household__danger"
                   type="button"
                   [disabled]="loading()"
                   (click)="leave(household.householdId)"
                 >
+                  Potwierdź
+                </button>
+                <button class="household__quiet" type="button" (click)="cancelLeave()">Anuluj</button>
+              } @else {
+                <button class="household__danger" type="button" (click)="askLeave(household.householdId)">
                   Opuść
                 </button>
               }
-            </div>
-          </li>
-        }
-      </ul>
-
-      @if (store.status()?.outgoingInvitation; as outgoing) {
-        <div class="household__pendingOut">
-          <span class="household__statusIcon">⏳</span>
-          <div>
-            <p class="household__statusTitle">Zaproszenie wysłane</p>
-            <p class="household__statusDesc">
-              Czeka na akceptację przez
-              <strong>{{ outgoing.partnerDisplayName }}</strong>
-            </p>
+            }
           </div>
-        </div>
-        <button
-          class="household__btn household__btn--danger"
-          type="button"
-          [disabled]="loading()"
-          (click)="cancelInvitation()"
-        >
+        </li>
+      }
+    </ul>
+
+    @if (store.status()?.outgoingInvitation; as outgoing) {
+      <section class="household__invite">
+        <p class="household__inviteTitle">Wysłane zaproszenie</p>
+        <p class="household__inviteText">Czeka na akceptację przez {{ outgoing.partnerDisplayName }}.</p>
+        <button class="household__danger" type="button" [disabled]="loading()" (click)="cancelInvitation()">
           Cofnij zaproszenie
         </button>
-      }
+      </section>
+    }
 
-      @if (store.status()?.incomingInvitation; as incoming) {
-        <div class="household__pendingIn">
-          <span class="household__statusIcon">🔔</span>
-          <div>
-            <p class="household__statusTitle">
-              <strong>{{ incoming.partnerDisplayName }}</strong> zaprasza Cię do swojego gospodarstwa
-            </p>
-          </div>
-        </div>
-        <div class="household__actions">
-          <button
-            class="household__btn household__btn--primary"
-            type="button"
-            [disabled]="loading()"
-            (click)="accept()"
-          >
-            ✓ Akceptuj
-          </button>
-          <button
-            class="household__btn household__btn--secondary"
-            type="button"
-            [disabled]="loading()"
-            (click)="reject()"
-          >
-            ✗ Odrzuć
-          </button>
-        </div>
-      }
-
-      @if (canInvite()) {
-        <form class="household__form" (ngSubmit)="sendInvitation()">
-          <label class="household__label" for="partnerEmail">Email partnera:</label>
+    @if (canInvite()) {
+      <form class="household__form" (ngSubmit)="sendInvitation()">
+        <label class="household__label" for="partnerEmail">Email partnera</label>
+        <div class="household__formRow">
           <input
             id="partnerEmail"
             class="household__input"
@@ -128,19 +105,11 @@
             (input)="setEmail($any($event.target).value)"
             required
           />
-          <button
-            class="household__btn household__btn--primary"
-            type="submit"
-            [disabled]="loading() || !inviteEmail().trim()"
-          >
-            @if (loading()) {
-              Wysyłanie...
-            } @else {
-              Wyślij zaproszenie
-            }
+          <button class="btn" type="submit" [disabled]="loading() || !inviteEmail().trim()">
+            {{ loading() ? 'Wysyłanie...' : 'Zaproś' }}
           </button>
-        </form>
-      }
+        </div>
+      </form>
     }
-  </div>
-</div>
+  }
+</section>

@@ -1,5 +1,6 @@
 <section class="form">
   <a class="form__back" routerLink="/plants">← Rośliny</a>
+  <p class="form__kicker">Roślina</p>
   <h1 class="form__title">{{ isEdit ? 'Edytuj roślinę' : 'Dodaj roślinę' }}</h1>
 
   @if (error()) {
@@ -80,7 +81,7 @@
           </button>
         }
       </div>
-      <button class="form__submit" type="submit" [disabled]="saving()">
+      <button class="btn" type="submit" [disabled]="saving()">
         {{ saving() ? 'Zapisywanie...' : 'Zapisz' }}
       </button>
     </form>
