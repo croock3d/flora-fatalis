@@ -55,6 +55,31 @@
           </button>
         }
       </div>
+      <div class="form__watering">
+        <p class="form__hint">
+          Nawożenie, domyślnie dla gatunku:
+          {{
+            selectedFertilizingInterval()
+              ? selectedFertilizingInterval() + ' dni'
+              : 'brak danych'
+          }}
+        </p>
+        <label class="form__label">
+          Nawożenie dla tej rośliny (dni)
+          <input
+            class="form__input"
+            type="number"
+            min="1"
+            formControlName="fertilizingIntervalDaysOverride"
+            placeholder="zostaw puste, aby użyć wartości gatunku"
+          />
+        </label>
+        @if (form.controls.fertilizingIntervalDaysOverride.value) {
+          <button class="form__clear" type="button" (click)="clearFertilizingOverride()">
+            Wróć do wartości gatunku
+          </button>
+        }
+      </div>
       <button class="form__submit" type="submit" [disabled]="saving()">
         {{ saving() ? 'Zapisywanie...' : 'Zapisz' }}
       </button>

@@ -30,13 +30,25 @@ export class DashboardPage {
     return `${days} dni zaległości`;
   }
 
+  protected careLabel(type: string): string {
+    return type === 'FERTILIZING' ? 'nawożenie' : 'podlewanie';
+  }
+
+  protected careIcon(type: string): string {
+    return type === 'FERTILIZING' ? '🌿' : '💧';
+  }
+
+  protected itemKey(item: DashboardItemDto): string {
+    return item.plantId + item.careType;
+  }
+
   protected water(item: DashboardItemDto): void {
     const quantityMl = this.parseMl(this.quantityDrafts()[item.plantId]);
     if (quantityMl === 'invalid') {
       this.error.set('Ilość wody musi być liczbą całkowitą większą od 0');
       return;
     }
-    this.wateringPlantId.set(item.plantId);
+    this.wateringPlantId.set(this.itemKey(item));
     this.api.water(item.plantId, quantityMl).subscribe({
       next: () => {
         this.wateringPlantId.set(null);
@@ -46,6 +58,20 @@ export class DashboardPage {
       error: () => {
         this.wateringPlantId.set(null);
         this.error.set('Nie udało się oznaczyć podlewania');
+      },
+    });
+  }
+
+  protected fertilize(item: DashboardItemDto): void {
+    this.wateringPlantId.set(this.itemKey(item));
+    this.api.fertilize(item.plantId).subscribe({
+      next: () => {
+        this.wateringPlantId.set(null);
+        this.reload();
+      },
+      error: () => {
+        this.wateringPlantId.set(null);
+        this.error.set('Nie udało się oznaczyć nawożenia');
       },
     });
   }

@@ -2,8 +2,12 @@ package com.crooked.florafatalis.care.adapter.rest;
 
 import com.crooked.florafatalis.care.application.port.in.DeleteCareEventUseCase;
 import com.crooked.florafatalis.care.application.port.in.DeleteCareEventUseCase.DeleteCareEventCommand;
+import com.crooked.florafatalis.care.application.port.in.FertilizePlantUseCase;
+import com.crooked.florafatalis.care.application.port.in.FertilizePlantUseCase.FertilizePlantCommand;
 import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase;
 import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase.CareDashboard;
+import com.crooked.florafatalis.care.application.port.in.GetPlantCareStatusUseCase;
+import com.crooked.florafatalis.care.application.port.in.GetPlantCareStatusUseCase.PlantCareStatus;
 import com.crooked.florafatalis.care.application.port.in.ListWateringHistoryUseCase;
 import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase;
 import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase.WaterPlantCommand;
@@ -32,9 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 class CareController {
 
   private final WaterPlantUseCase waterPlantUseCase;
+  private final FertilizePlantUseCase fertilizePlantUseCase;
   private final ListWateringHistoryUseCase listWateringHistoryUseCase;
   private final DeleteCareEventUseCase deleteCareEventUseCase;
   private final GetCareDashboardUseCase getCareDashboardUseCase;
+  private final GetPlantCareStatusUseCase getPlantCareStatusUseCase;
   private final CurrentUserProvider currentUserProvider;
   private final UserLookupPort userLookupPort;
 
@@ -47,6 +53,14 @@ class CareController {
         waterPlantUseCase.water(
             new WaterPlantCommand(
                 currentUserProvider.currentUserId(), new PlantId(plantId), quantityMl)));
+  }
+
+  @PostMapping("/plants/{plantId}/fertilize")
+  @ResponseStatus(HttpStatus.CREATED)
+  CareEventResponse fertilize(@PathVariable UUID plantId) {
+    return toResponse(
+        fertilizePlantUseCase.fertilize(
+            new FertilizePlantCommand(currentUserProvider.currentUserId(), new PlantId(plantId))));
   }
 
   @DeleteMapping("/care-events/{eventId}")
@@ -68,6 +82,11 @@ class CareController {
   @GetMapping("/dashboard")
   CareDashboard dashboard() {
     return getCareDashboardUseCase.get(currentUserProvider.currentUserId());
+  }
+
+  @GetMapping("/plants/{plantId}/care-status")
+  PlantCareStatus careStatus(@PathVariable UUID plantId) {
+    return getPlantCareStatusUseCase.get(currentUserProvider.currentUserId(), new PlantId(plantId));
   }
 
   private CareEventResponse toResponse(CareEvent event) {

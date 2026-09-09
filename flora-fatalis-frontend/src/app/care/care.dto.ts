@@ -11,8 +11,20 @@ export interface CareEventDto {
 export interface DashboardItemDto {
   plantId: string;
   plantName: string;
+  careType: 'WATERING' | 'FERTILIZING';
   dueOn: string;
   overdueDays: number;
+}
+
+export interface CareTypeStatusDto {
+  lastAt: string | null;
+  nextOn: string | null;
+  intervalDays: number | null;
+}
+
+export interface PlantCareStatusDto {
+  watering: CareTypeStatusDto;
+  fertilizing: CareTypeStatusDto | null;
 }
 
 export interface CareDashboardDto {

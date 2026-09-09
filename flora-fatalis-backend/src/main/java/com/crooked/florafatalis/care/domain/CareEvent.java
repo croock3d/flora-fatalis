@@ -47,4 +47,18 @@ public record CareEvent(
         CareSource.MANUAL,
         null);
   }
+
+  public static CareEvent fertilizing(
+      PlantId plantId, HouseholdId householdId, UserId performedBy, Instant performedAt) {
+    return new CareEvent(
+        CareEventId.newId(),
+        plantId,
+        householdId,
+        CareType.FERTILIZING,
+        performedAt,
+        performedBy,
+        null,
+        CareSource.MANUAL,
+        null);
+  }
 }

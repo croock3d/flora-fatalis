@@ -61,6 +61,7 @@ class UploadPlantPhotoUseCaseHandlerTest {
             "Monstera",
             null,
             null,
+            null,
             userId,
             now);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
@@ -87,6 +88,7 @@ class UploadPlantPhotoUseCaseHandlerTest {
             SpeciesId.newId(),
             LocationId.newId(),
             "Monstera",
+            null,
             null,
             null,
             userId,

@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { CareApiService } from '../care/care-api.service';
+import { PlantCareStatusDto } from '../care/care.dto';
 import { LocationsApiService } from '../locations/locations-api.service';
 import { compressImage } from '../photos/compress-image';
 import { PlantPhotoDto } from '../photos/photo.dto';
@@ -40,17 +41,15 @@ export class PlantDetailsPage {
   protected readonly photos = signal<PlantPhotoDto[]>([]);
   protected readonly history = signal<PlantHistoryItemDto[]>([]);
   protected readonly historyDays = computed(() => this.groupHistory(this.history()));
+  protected readonly careStatus = signal<PlantCareStatusDto | null>(null);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly archiving = signal(false);
   protected readonly watering = signal(false);
+  protected readonly fertilizing = signal(false);
   protected readonly uploading = signal(false);
   protected readonly deletingEventId = signal<string | null>(null);
   protected readonly quantityMl = signal('');
-
-  protected readonly speciesIntervalDays = computed(
-    () => this.species()?.defaultWateringIntervalDays ?? null,
-  );
 
   constructor() {
     this.reload();
@@ -83,10 +82,26 @@ export class PlantDetailsPage {
         this.watering.set(false);
         this.quantityMl.set('');
         this.reloadHistory();
+        this.reloadCareStatus();
       },
       error: () => {
         this.watering.set(false);
         this.error.set('Nie udało się oznaczyć podlewania');
+      },
+    });
+  }
+
+  protected fertilize(): void {
+    this.fertilizing.set(true);
+    this.careApi.fertilize(this.plantId).subscribe({
+      next: () => {
+        this.fertilizing.set(false);
+        this.reloadHistory();
+        this.reloadCareStatus();
+      },
+      error: () => {
+        this.fertilizing.set(false);
+        this.error.set('Nie udało się oznaczyć nawożenia');
       },
     });
   }
@@ -150,13 +165,15 @@ export class PlantDetailsPage {
       locations: this.locationsApi.list(),
       photos: this.photosApi.list(this.plantId),
       history: this.plantsApi.history(this.plantId),
+      careStatus: this.careApi.careStatus(this.plantId),
     }).subscribe({
-      next: ({ plant, species, locations, photos, history }) => {
+      next: ({ plant, species, locations, photos, history, careStatus }) => {
         this.plant.set(plant);
         this.species.set(species.find((item) => item.id === plant.speciesId) ?? null);
         this.locationName.set(locations.find((item) => item.id === plant.locationId)?.name ?? '');
         this.photos.set(photos);
         this.history.set(history);
+        this.careStatus.set(careStatus);
         this.loading.set(false);
       },
       error: () => {
@@ -173,6 +190,19 @@ export class PlantDetailsPage {
 
   private reloadHistory(): void {
     this.plantsApi.history(this.plantId).subscribe((history) => this.history.set(history));
+  }
+
+  private reloadCareStatus(): void {
+    this.careApi.careStatus(this.plantId).subscribe((status) => this.careStatus.set(status));
+  }
+
+  protected careDate(iso: string | null | undefined): string {
+    if (!iso) return 'brak';
+    return new Intl.DateTimeFormat('pl-PL', {
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'Europe/Warsaw',
+    }).format(new Date(iso));
   }
 
   protected eventTime(iso: string): string {

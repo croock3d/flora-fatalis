@@ -28,7 +28,7 @@ class ListSpeciesUseCaseHandlerTest {
   @Test
   void returnsSpeciesFromRepository() {
     Species other =
-        new Species(SpeciesId.newId(), "Inny", null, 7, null, null, null, null, null, null);
+        new Species(SpeciesId.newId(), "Inny", null, 7, null, null, null, null, null, null, null);
     given(speciesRepository.findAll()).willReturn(List.of(other));
 
     List<Species> result = handler.list();

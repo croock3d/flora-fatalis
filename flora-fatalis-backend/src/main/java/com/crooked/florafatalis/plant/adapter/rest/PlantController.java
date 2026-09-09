@@ -80,6 +80,7 @@ class PlantController {
                 new LocationId(request.locationId()),
                 request.name(),
                 request.wateringIntervalDaysOverride(),
+                request.fertilizingIntervalDaysOverride(),
                 request.acquiredAt())));
   }
 
@@ -94,6 +95,7 @@ class PlantController {
                 new LocationId(request.locationId()),
                 request.name(),
                 request.wateringIntervalDaysOverride(),
+                request.fertilizingIntervalDaysOverride(),
                 request.acquiredAt())));
   }
 
@@ -128,6 +130,7 @@ class PlantController {
         plant.locationId().value(),
         plant.name(),
         plant.wateringIntervalDaysOverride(),
+        plant.fertilizingIntervalDaysOverride(),
         plant.acquiredAt(),
         plant.archivedAt(),
         plant.createdAt());
@@ -138,6 +141,7 @@ class PlantController {
       UUID locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt) {}
 
   record PlantResponse(
@@ -146,6 +150,7 @@ class PlantController {
       UUID locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt,
       Instant archivedAt,
       Instant createdAt) {}

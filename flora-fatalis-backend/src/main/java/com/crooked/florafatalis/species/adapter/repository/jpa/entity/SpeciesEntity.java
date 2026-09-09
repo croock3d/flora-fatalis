@@ -46,4 +46,7 @@ public class SpeciesEntity {
 
   @Column(name = "category")
   private String category;
+
+  @Column(name = "default_fertilizing_interval_days")
+  private Integer defaultFertilizingIntervalDays;
 }

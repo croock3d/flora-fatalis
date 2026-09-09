@@ -36,6 +36,9 @@ public class PlantEntity {
   @Column(name = "watering_interval_days_override")
   private Integer wateringIntervalDaysOverride;
 
+  @Column(name = "fertilizing_interval_days_override")
+  private Integer fertilizingIntervalDaysOverride;
+
   @Column(name = "acquired_at")
   private Instant acquiredAt;
 

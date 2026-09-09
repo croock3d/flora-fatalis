@@ -50,6 +50,7 @@ public class UpdatePlantUseCaseHandler implements UpdatePlantUseCase {
             command.locationId(),
             command.name(),
             command.wateringIntervalDaysOverride(),
+            command.fertilizingIntervalDaysOverride(),
             command.acquiredAt());
     plantRepository.save(updated);
     return updated;

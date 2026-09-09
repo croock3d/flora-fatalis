@@ -45,6 +45,7 @@ class ListPlantsUseCaseHandlerTest {
             "Monstera",
             null,
             null,
+            null,
             userId,
             Instant.parse("2026-01-01T00:00:00Z"));
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));

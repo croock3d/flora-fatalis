@@ -1,4 +1,4 @@
-export type PlantHistoryType = 'WATERING' | 'PHOTO' | 'CREATED';
+export type PlantHistoryType = 'WATERING' | 'FERTILIZING' | 'PHOTO' | 'CREATED';
 
 export interface PlantHistoryItemDto {
   type: PlantHistoryType;

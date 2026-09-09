@@ -69,22 +69,33 @@ class ListPlantHistoryUseCaseHandlerTest {
             0);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
+    CareEvent fertilizing =
+        CareEvent.fertilizing(
+            plant.id(), householdId, userId, Instant.parse("2026-09-08T16:40:00Z"));
     given(careEventRepository.findByPlantIdAndCareType(plant.id(), CareType.WATERING))
         .willReturn(List.of(wateringWithMl, wateringWithoutMl));
+    given(careEventRepository.findByPlantIdAndCareType(plant.id(), CareType.FERTILIZING))
+        .willReturn(List.of(fertilizing));
     given(plantPhotoRepository.findByPlantId(plant.id())).willReturn(List.of(photo));
 
     List<PlantHistoryItem> items = handler.list(userId, plant.id());
 
-    assertThat(items).hasSize(4);
+    assertThat(items).hasSize(5);
     assertThat(items)
         .extracting(PlantHistoryItem::type)
         .containsExactly(
-            HistoryType.PHOTO, HistoryType.WATERING, HistoryType.WATERING, HistoryType.CREATED);
+            HistoryType.PHOTO,
+            HistoryType.WATERING,
+            HistoryType.FERTILIZING,
+            HistoryType.WATERING,
+            HistoryType.CREATED);
     assertThat(items.get(0).sourceId()).isEqualTo(photo.id().value());
     assertThat(items.get(1).quantityMl()).isEqualTo(500);
-    assertThat(items.get(2).quantityMl()).isNull();
-    assertThat(items.get(3).occurredAt()).isEqualTo(createdAt);
+    assertThat(items.get(2).type()).isEqualTo(HistoryType.FERTILIZING);
+    assertThat(items.get(3).quantityMl()).isNull();
+    assertThat(items.get(4).occurredAt()).isEqualTo(createdAt);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.WATERING).hasSize(2);
+    assertThat(items).filteredOn(item -> item.type() == HistoryType.FERTILIZING).hasSize(1);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.PHOTO).hasSize(1);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.CREATED).hasSize(1);
   }
@@ -97,6 +108,7 @@ class ListPlantHistoryUseCaseHandlerTest {
             SpeciesId.newId(),
             LocationId.newId(),
             "Monstera",
+            null,
             null,
             null,
             userId,
@@ -114,6 +126,7 @@ class ListPlantHistoryUseCaseHandlerTest {
         SpeciesId.newId(),
         LocationId.newId(),
         "Monstera",
+        null,
         null,
         null,
         userId,

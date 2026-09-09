@@ -13,11 +13,12 @@ public interface GetCareDashboardUseCase {
   record CareDashboard(
       List<DashboardItem> overdue, List<DashboardItem> dueToday, List<DashboardItem> upcoming) {}
 
-  record DashboardItem(UUID plantId, String plantName, LocalDate dueOn, int overdueDays) {
+  record DashboardItem(
+      UUID plantId, String plantName, String careType, LocalDate dueOn, int overdueDays) {
 
     public static DashboardItem of(
-        PlantId plantId, String plantName, LocalDate dueOn, int overdueDays) {
-      return new DashboardItem(plantId.value(), plantName, dueOn, overdueDays);
+        PlantId plantId, String plantName, String careType, LocalDate dueOn, int overdueDays) {
+      return new DashboardItem(plantId.value(), plantName, careType, dueOn, overdueDays);
     }
   }
 }

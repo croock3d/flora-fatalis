@@ -45,6 +45,7 @@ public class PlantRepositoryAdapter implements PlantRepository {
     entity.setLocationId(plant.locationId().value());
     entity.setName(plant.name());
     entity.setWateringIntervalDaysOverride(plant.wateringIntervalDaysOverride());
+    entity.setFertilizingIntervalDaysOverride(plant.fertilizingIntervalDaysOverride());
     entity.setAcquiredAt(plant.acquiredAt());
     entity.setArchivedAt(plant.archivedAt());
     entity.setCreatedBy(plant.createdBy().value());
@@ -60,6 +61,7 @@ public class PlantRepositoryAdapter implements PlantRepository {
         new LocationId(entity.getLocationId()),
         entity.getName(),
         entity.getWateringIntervalDaysOverride(),
+        entity.getFertilizingIntervalDaysOverride(),
         entity.getAcquiredAt(),
         entity.getArchivedAt(),
         new UserId(entity.getCreatedBy()),

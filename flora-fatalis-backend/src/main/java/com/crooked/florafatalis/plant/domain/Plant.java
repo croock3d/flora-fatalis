@@ -14,6 +14,7 @@ public record Plant(
     LocationId locationId,
     String name,
     Integer wateringIntervalDaysOverride,
+    Integer fertilizingIntervalDaysOverride,
     Instant acquiredAt,
     Instant archivedAt,
     UserId createdBy,
@@ -36,6 +37,9 @@ public record Plant(
     if (wateringIntervalDaysOverride != null && wateringIntervalDaysOverride < 1) {
       throw new IllegalArgumentException("wateringIntervalDaysOverride must be at least 1");
     }
+    if (fertilizingIntervalDaysOverride != null && fertilizingIntervalDaysOverride < 1) {
+      throw new IllegalArgumentException("fertilizingIntervalDaysOverride must be at least 1");
+    }
   }
 
   public static Plant create(
@@ -44,6 +48,7 @@ public record Plant(
       LocationId locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt,
       UserId createdBy,
       Instant createdAt) {
@@ -54,6 +59,7 @@ public record Plant(
         locationId,
         name.strip(),
         wateringIntervalDaysOverride,
+        fertilizingIntervalDaysOverride,
         acquiredAt,
         null,
         createdBy,
@@ -65,6 +71,7 @@ public record Plant(
       LocationId locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt) {
     if (archivedAt != null) {
       throw new IllegalStateException("Cannot update archived plant");
@@ -76,6 +83,7 @@ public record Plant(
         locationId,
         name.strip(),
         wateringIntervalDaysOverride,
+        fertilizingIntervalDaysOverride,
         acquiredAt,
         archivedAt,
         createdBy,
@@ -93,6 +101,7 @@ public record Plant(
         locationId,
         name,
         wateringIntervalDaysOverride,
+        fertilizingIntervalDaysOverride,
         acquiredAt,
         now,
         createdBy,

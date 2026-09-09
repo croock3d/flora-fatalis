@@ -65,14 +65,14 @@ class CreatePlantUseCaseHandlerTest {
     given(speciesRepository.findById(speciesId))
         .willReturn(
             Optional.of(
-                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null)));
+                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null, null)));
     given(locationRepository.findById(locationId))
         .willReturn(
             Optional.of(new Location(locationId, householdId, "Salon", LocationKind.INDOOR)));
 
     Plant created =
         handler.create(
-            new CreatePlantCommand(userId, speciesId, locationId, "Monstera", null, null));
+            new CreatePlantCommand(userId, speciesId, locationId, "Monstera", null, null, null));
 
     ArgumentCaptor<Plant> captor = ArgumentCaptor.forClass(Plant.class);
     then(plantRepository).should().save(captor.capture());
@@ -89,7 +89,8 @@ class CreatePlantUseCaseHandlerTest {
     assertThatThrownBy(
             () ->
                 handler.create(
-                    new CreatePlantCommand(userId, speciesId, locationId, "Monstera", null, null)))
+                    new CreatePlantCommand(
+                        userId, speciesId, locationId, "Monstera", null, null, null)))
         .isInstanceOf(NoActiveHouseholdException.class);
   }
 
@@ -101,7 +102,8 @@ class CreatePlantUseCaseHandlerTest {
     assertThatThrownBy(
             () ->
                 handler.create(
-                    new CreatePlantCommand(userId, speciesId, locationId, "Monstera", null, null)))
+                    new CreatePlantCommand(
+                        userId, speciesId, locationId, "Monstera", null, null, null)))
         .isInstanceOf(SpeciesNotFoundException.class);
   }
 
@@ -111,7 +113,7 @@ class CreatePlantUseCaseHandlerTest {
     given(speciesRepository.findById(speciesId))
         .willReturn(
             Optional.of(
-                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null)));
+                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null, null)));
     given(locationRepository.findById(locationId))
         .willReturn(
             Optional.of(
@@ -120,7 +122,8 @@ class CreatePlantUseCaseHandlerTest {
     assertThatThrownBy(
             () ->
                 handler.create(
-                    new CreatePlantCommand(userId, speciesId, locationId, "Monstera", null, null)))
+                    new CreatePlantCommand(
+                        userId, speciesId, locationId, "Monstera", null, null, null)))
         .isInstanceOf(HouseholdAccessDeniedException.class);
   }
 }

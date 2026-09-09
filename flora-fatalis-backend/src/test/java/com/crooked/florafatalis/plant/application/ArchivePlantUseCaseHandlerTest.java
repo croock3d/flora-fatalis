@@ -54,6 +54,7 @@ class ArchivePlantUseCaseHandlerTest {
             "Monstera",
             null,
             null,
+            null,
             userId,
             now);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
@@ -75,6 +76,7 @@ class ArchivePlantUseCaseHandlerTest {
             SpeciesId.newId(),
             LocationId.newId(),
             "Monstera",
+            null,
             null,
             null,
             userId,

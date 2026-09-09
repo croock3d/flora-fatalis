@@ -4,6 +4,7 @@ export interface PlantDto {
   locationId: string;
   name: string;
   wateringIntervalDaysOverride: number | null;
+  fertilizingIntervalDaysOverride: number | null;
   acquiredAt: string | null;
   archivedAt: string | null;
   createdAt: string;
@@ -14,5 +15,6 @@ export interface PlantRequest {
   locationId: string;
   name: string;
   wateringIntervalDaysOverride: number | null;
+  fertilizingIntervalDaysOverride: number | null;
   acquiredAt: string | null;
 }

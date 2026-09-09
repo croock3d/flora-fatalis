@@ -38,15 +38,27 @@ export class PlantFormPage {
     speciesId: ['', Validators.required],
     locationId: ['', Validators.required],
     wateringIntervalDaysOverride: [''],
+    fertilizingIntervalDaysOverride: [''],
   });
 
+  protected selectedSpecies(): SpeciesDto | undefined {
+    return this.species().find((item) => item.id === this.form.controls.speciesId.value);
+  }
+
   protected selectedSpeciesInterval(): number | null {
-    const speciesId = this.form.controls.speciesId.value;
-    return this.species().find((item) => item.id === speciesId)?.defaultWateringIntervalDays ?? null;
+    return this.selectedSpecies()?.defaultWateringIntervalDays ?? null;
+  }
+
+  protected selectedFertilizingInterval(): number | null {
+    return this.selectedSpecies()?.defaultFertilizingIntervalDays ?? null;
   }
 
   protected clearOverride(): void {
     this.form.controls.wateringIntervalDaysOverride.setValue('');
+  }
+
+  protected clearFertilizingOverride(): void {
+    this.form.controls.fertilizingIntervalDaysOverride.setValue('');
   }
 
   constructor() {
@@ -66,6 +78,8 @@ export class PlantFormPage {
                 locationId: plant.locationId,
                 wateringIntervalDaysOverride:
                   plant.wateringIntervalDaysOverride?.toString() ?? '',
+                fertilizingIntervalDaysOverride:
+                  plant.fertilizingIntervalDaysOverride?.toString() ?? '',
               });
               this.loading.set(false);
             },
@@ -93,11 +107,13 @@ export class PlantFormPage {
 
     const value = this.form.getRawValue();
     const override = value.wateringIntervalDaysOverride.trim();
+    const fertilizingOverride = value.fertilizingIntervalDaysOverride.trim();
     const request: PlantRequest = {
       name: value.name.trim(),
       speciesId: value.speciesId,
       locationId: value.locationId,
       wateringIntervalDaysOverride: override ? Number(override) : null,
+      fertilizingIntervalDaysOverride: fertilizingOverride ? Number(fertilizingOverride) : null,
       acquiredAt: null,
     };
 

@@ -48,6 +48,7 @@ public class CreatePlantUseCaseHandler implements CreatePlantUseCase {
             command.locationId(),
             command.name(),
             command.wateringIntervalDaysOverride(),
+            command.fertilizingIntervalDaysOverride(),
             command.acquiredAt(),
             command.userId(),
             Instant.now(clock));

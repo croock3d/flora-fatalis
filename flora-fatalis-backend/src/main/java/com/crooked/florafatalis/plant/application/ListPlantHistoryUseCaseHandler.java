@@ -42,17 +42,8 @@ public class ListPlantHistoryUseCaseHandler implements ListPlantHistoryUseCase {
     items.add(
         new PlantHistoryItem(
             HistoryType.CREATED, plant.createdAt(), plant.id().value(), null, plant.createdBy()));
-    careEventRepository
-        .findByPlantIdAndCareType(plantId, CareType.WATERING)
-        .forEach(
-            event ->
-                items.add(
-                    new PlantHistoryItem(
-                        HistoryType.WATERING,
-                        event.performedAt(),
-                        event.id().value(),
-                        event.quantityMl(),
-                        event.performedBy())));
+    addCareEvents(items, plantId, CareType.WATERING, HistoryType.WATERING);
+    addCareEvents(items, plantId, CareType.FERTILIZING, HistoryType.FERTILIZING);
     plantPhotoRepository
         .findByPlantId(plantId)
         .forEach(
@@ -65,5 +56,20 @@ public class ListPlantHistoryUseCaseHandler implements ListPlantHistoryUseCase {
             .reversed()
             .thenComparing(item -> item.type().ordinal()));
     return items;
+  }
+
+  private void addCareEvents(
+      List<PlantHistoryItem> items, PlantId plantId, CareType careType, HistoryType historyType) {
+    careEventRepository
+        .findByPlantIdAndCareType(plantId, careType)
+        .forEach(
+            event ->
+                items.add(
+                    new PlantHistoryItem(
+                        historyType,
+                        event.performedAt(),
+                        event.id().value(),
+                        event.quantityMl(),
+                        event.performedBy())));
   }
 }

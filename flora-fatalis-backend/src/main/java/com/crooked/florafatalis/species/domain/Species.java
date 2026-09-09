@@ -12,7 +12,8 @@ public record Species(
     String wateringIntervalLabel,
     String lightPreference,
     String humidityPreference,
-    String category) {
+    String category,
+    Integer defaultFertilizingIntervalDays) {
 
   public Species {
     Objects.requireNonNull(id, "id must not be null");
@@ -22,6 +23,9 @@ public record Species(
     }
     if (defaultWateringIntervalDays < 1) {
       throw new IllegalArgumentException("defaultWateringIntervalDays must be at least 1");
+    }
+    if (defaultFertilizingIntervalDays != null && defaultFertilizingIntervalDays < 1) {
+      throw new IllegalArgumentException("defaultFertilizingIntervalDays must be at least 1");
     }
   }
 }

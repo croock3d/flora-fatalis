@@ -21,15 +21,21 @@
       <div>
         <dt>Podlewanie</dt>
         <dd>
-          @if (current.wateringIntervalDaysOverride) {
-            Dla tej rośliny: {{ current.wateringIntervalDaysOverride }} dni
-          } @else if (speciesIntervalDays()) {
-            Domyślnie dla gatunku: {{ speciesIntervalDays() }} dni
-          } @else {
-            z gatunku
-          }
+          Ostatnie: {{ careDate(careStatus()?.watering?.lastAt) }}
+          <br />
+          Następne: {{ careDate(careStatus()?.watering?.nextOn) }}
         </dd>
       </div>
+      @if (careStatus()?.fertilizing; as fertilizingStatus) {
+        <div>
+          <dt>Nawożenie</dt>
+          <dd>
+            Ostatnie: {{ careDate(fertilizingStatus.lastAt) }}
+            <br />
+            Następne: {{ careDate(fertilizingStatus.nextOn) }}
+          </dd>
+        </div>
+      }
     </dl>
 
     <div class="details__waterBox">
@@ -46,6 +52,14 @@
         {{ watering() ? 'Zapisywanie...' : 'Podlej' }}
       </button>
     </div>
+    <button
+      class="details__fertilize"
+      type="button"
+      [disabled]="fertilizing()"
+      (click)="fertilize()"
+    >
+      {{ fertilizing() ? 'Zapisywanie...' : '🌿 Nawożono' }}
+    </button>
 
     <div class="details__actions">
       <a class="details__edit" [routerLink]="['/plants', current.id, 'edit']">Edytuj</a>
@@ -95,6 +109,25 @@
                     [src]="photoUrls.objectUrl(event.photoUrl) | async"
                     alt="Zdjęcie z historii rośliny"
                   />
+                } @else if (event.type === 'FERTILIZING') {
+                  <div class="details__eventRow">
+                    <div>
+                      <p class="details__eventTitle">🌿 Nawożono</p>
+                      <p class="details__historyMeta">
+                        {{ eventTime(event.occurredAt) }}
+                        @if (event.performedByName) {
+                          · {{ event.performedByName }}
+                        }
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      [disabled]="deletingEventId() === event.sourceId"
+                      (click)="deleteEvent(event)"
+                    >
+                      Usuń
+                    </button>
+                  </div>
                 } @else if (event.type === 'WATERING') {
                   <div class="details__eventRow">
                     <div>

@@ -12,6 +12,7 @@ public interface ListPlantHistoryUseCase {
 
   enum HistoryType {
     WATERING,
+    FERTILIZING,
     PHOTO,
     CREATED
   }

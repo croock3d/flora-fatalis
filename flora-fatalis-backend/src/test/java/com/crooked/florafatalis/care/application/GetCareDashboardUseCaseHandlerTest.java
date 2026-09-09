@@ -7,6 +7,7 @@ import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase
 import com.crooked.florafatalis.care.application.port.out.CareEventRepository;
 import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareType;
+import com.crooked.florafatalis.care.domain.FertilizingCarePolicy;
 import com.crooked.florafatalis.care.domain.IntervalCarePolicy;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.location.domain.LocationId;
@@ -45,7 +46,7 @@ class GetCareDashboardUseCaseHandlerTest {
   private final HouseholdId householdId = HouseholdId.newId();
   private final SpeciesId speciesId = SpeciesId.newId();
   private final Species species =
-      new Species(speciesId, "Monstera", null, 7, null, null, null, null, null, null);
+      new Species(speciesId, "Monstera", null, 7, null, null, null, null, null, null, null);
 
   @BeforeEach
   void setUp() {
@@ -55,6 +56,7 @@ class GetCareDashboardUseCaseHandlerTest {
             speciesRepository,
             careEventRepository,
             new IntervalCarePolicy(),
+            new FertilizingCarePolicy(),
             activeHouseholdPort,
             Clock.fixed(now, ZoneOffset.UTC));
     ReflectionTestUtils.setField(handler, "timezone", "UTC");
@@ -71,6 +73,8 @@ class GetCareDashboardUseCaseHandlerTest {
     given(plantRepository.findActiveByHousehold(householdId))
         .willReturn(List.of(overdue, dueToday, upcoming, later));
     given(speciesRepository.findAll()).willReturn(List.of(species));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(List.of());
     given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
         .willReturn(
             List.of(
@@ -114,6 +118,8 @@ class GetCareDashboardUseCaseHandlerTest {
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of(plant));
     given(speciesRepository.findAll()).willReturn(List.of(species));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(List.of());
     given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
         .willReturn(
             List.of(
@@ -127,8 +133,54 @@ class GetCareDashboardUseCaseHandlerTest {
     assertThat(dashboard.dueToday()).isEmpty();
   }
 
+  @Test
+  void includesFertilizingTasksSeparatelyFromWatering() {
+    Species fertilizingSpecies =
+        new Species(speciesId, "Monstera", null, 7, null, null, null, null, null, null, 30);
+    Plant plant = plant("Fikus", null);
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of(plant));
+    given(speciesRepository.findAll()).willReturn(List.of(fertilizingSpecies));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
+        .willReturn(
+            List.of(
+                CareEvent.watering(
+                    plant.id(), householdId, userId, Instant.parse("2026-01-10T08:00:00Z"), null)));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(
+            List.of(
+                CareEvent.fertilizing(
+                    plant.id(), householdId, userId, Instant.parse("2025-12-11T08:00:00Z"))));
+
+    CareDashboard dashboard = handler.get(userId);
+
+    assertThat(dashboard.dueToday())
+        .extracting(item -> item.careType())
+        .containsExactly("FERTILIZING");
+    assertThat(dashboard.upcoming())
+        .extracting(item -> item.careType())
+        .containsExactly("WATERING");
+  }
+
+  @Test
+  void archivedPlantsAreExcludedBecauseRepositoryReturnsActiveOnly() {
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of());
+    given(speciesRepository.findAll()).willReturn(List.of(species));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
+        .willReturn(List.of());
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(List.of());
+
+    CareDashboard dashboard = handler.get(userId);
+
+    assertThat(dashboard.overdue()).isEmpty();
+    assertThat(dashboard.dueToday()).isEmpty();
+    assertThat(dashboard.upcoming()).isEmpty();
+  }
+
   private Plant plant(String name, Integer override) {
     return Plant.create(
-        householdId, speciesId, LocationId.newId(), name, override, null, userId, now);
+        householdId, speciesId, LocationId.newId(), name, override, null, null, userId, now);
   }
 }

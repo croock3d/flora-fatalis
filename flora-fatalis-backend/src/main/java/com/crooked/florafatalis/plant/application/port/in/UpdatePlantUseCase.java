@@ -18,5 +18,6 @@ public interface UpdatePlantUseCase {
       LocationId locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt) {}
 }

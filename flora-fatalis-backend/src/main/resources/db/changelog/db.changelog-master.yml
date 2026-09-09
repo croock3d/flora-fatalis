@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/010-household-owner-and-invitations.yml
   - include:
       file: db/changelog/011-multi-household-membership.yml
+  - include:
+      file: db/changelog/012-add-fertilizing-intervals.yml

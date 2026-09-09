@@ -16,5 +16,6 @@ public interface CreatePlantUseCase {
       LocationId locationId,
       String name,
       Integer wateringIntervalDaysOverride,
+      Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt) {}
 }

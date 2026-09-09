@@ -60,6 +60,7 @@
 .details__edit,
 .details__archive,
 .details__water,
+.details__fertilize,
 .details__upload {
   height: 42px;
   padding: 0 16px;
@@ -102,6 +103,15 @@
 .details__water {
   flex: 1;
   background: #0f766e;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.details__fertilize {
+  width: 100%;
+  margin-bottom: 12px;
+  background: #365314;
   color: #ffffff;
   border: none;
   cursor: pointer;

@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-add-fertilizing-intervals
+      author: flora-fatalis
+      changes:
+        - addColumn:
+            tableName: species
+            columns:
+              - column:
+                  name: default_fertilizing_interval_days
+                  type: int
+        - addColumn:
+            tableName: plants
+            columns:
+              - column:
+                  name: fertilizing_interval_days_override
+                  type: int

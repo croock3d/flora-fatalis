@@ -21,7 +21,8 @@ class PlantTest {
   @Test
   void createStripsName() {
     Plant plant =
-        Plant.create(householdId, speciesId, locationId, "  Monstera  ", 10, now, userId, now);
+        Plant.create(
+            householdId, speciesId, locationId, "  Monstera  ", 10, null, now, userId, now);
 
     assertThat(plant.name()).isEqualTo("Monstera");
     assertThat(plant.wateringIntervalDaysOverride()).isEqualTo(10);
@@ -31,14 +32,16 @@ class PlantTest {
   @Test
   void blankNameThrows() {
     assertThatThrownBy(
-            () -> Plant.create(householdId, speciesId, locationId, "  ", null, null, userId, now))
+            () ->
+                Plant.create(
+                    householdId, speciesId, locationId, "  ", null, null, null, userId, now))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   void archiveSetsArchivedAt() {
     Plant plant =
-        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, userId, now);
+        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, null, userId, now);
 
     Plant archived = plant.archive(now);
 
@@ -50,7 +53,7 @@ class PlantTest {
   @Test
   void archiveTwiceThrows() {
     Plant archived =
-        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, userId, now)
+        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, null, userId, now)
             .archive(now);
 
     assertThatThrownBy(() -> archived.archive(now)).isInstanceOf(IllegalStateException.class);
@@ -59,10 +62,10 @@ class PlantTest {
   @Test
   void updateArchivedThrows() {
     Plant archived =
-        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, userId, now)
+        Plant.create(householdId, speciesId, locationId, "Monstera", null, null, null, userId, now)
             .archive(now);
 
-    assertThatThrownBy(() -> archived.update(speciesId, locationId, "Inna", null, null))
+    assertThatThrownBy(() -> archived.update(speciesId, locationId, "Inna", null, null, null))
         .isInstanceOf(IllegalStateException.class);
   }
 }

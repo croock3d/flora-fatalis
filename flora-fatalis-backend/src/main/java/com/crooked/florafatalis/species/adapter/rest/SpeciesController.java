@@ -30,7 +30,8 @@ class SpeciesController {
                     species.wateringIntervalLabel(),
                     species.lightPreference(),
                     species.humidityPreference(),
-                    species.category()))
+                    species.category(),
+                    species.defaultFertilizingIntervalDays()))
         .toList();
   }
 
@@ -44,5 +45,6 @@ class SpeciesController {
       String wateringIntervalLabel,
       String lightPreference,
       String humidityPreference,
-      String category) {}
+      String category,
+      Integer defaultFertilizingIntervalDays) {}
 }

@@ -9,4 +9,5 @@ export interface SpeciesDto {
   lightPreference: string | null;
   humidityPreference: string | null;
   category: string | null;
+  defaultFertilizingIntervalDays: number | null;
 }

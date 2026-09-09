@@ -1,13 +1,15 @@
 package com.crooked.florafatalis.care.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase.WaterPlantCommand;
+import com.crooked.florafatalis.care.application.port.in.FertilizePlantUseCase.FertilizePlantCommand;
 import com.crooked.florafatalis.care.application.port.out.CareEventRepository;
 import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareType;
+import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.location.domain.LocationId;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
@@ -27,13 +29,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class WaterPlantUseCaseHandlerTest {
+class FertilizePlantUseCaseHandlerTest {
 
   @Mock private PlantRepository plantRepository;
   @Mock private CareEventRepository careEventRepository;
   @Mock private ActiveHouseholdPort activeHouseholdPort;
 
-  private WaterPlantUseCaseHandler handler;
+  private FertilizePlantUseCaseHandler handler;
 
   private final Instant now = Instant.parse("2026-01-10T08:00:00Z");
   private final UserId userId = UserId.newId();
@@ -42,7 +44,7 @@ class WaterPlantUseCaseHandlerTest {
   @BeforeEach
   void setUp() {
     handler =
-        new WaterPlantUseCaseHandler(
+        new FertilizePlantUseCaseHandler(
             plantRepository,
             careEventRepository,
             activeHouseholdPort,
@@ -50,26 +52,16 @@ class WaterPlantUseCaseHandlerTest {
   }
 
   @Test
-  void recordsManualWatering() {
-    Plant plant =
-        Plant.create(
-            householdId,
-            SpeciesId.newId(),
-            LocationId.newId(),
-            "Monstera",
-            null,
-            null,
-            null,
-            userId,
-            now);
+  void recordsFertilizingEvent() {
+    Plant plant = plant(householdId);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
 
-    CareEvent event = handler.water(new WaterPlantCommand(userId, plant.id(), null));
+    CareEvent event = handler.fertilize(new FertilizePlantCommand(userId, plant.id()));
 
     ArgumentCaptor<CareEvent> captor = ArgumentCaptor.forClass(CareEvent.class);
     then(careEventRepository).should().save(captor.capture());
-    assertThat(captor.getValue().careType()).isEqualTo(CareType.WATERING);
+    assertThat(captor.getValue().careType()).isEqualTo(CareType.FERTILIZING);
     assertThat(captor.getValue().performedAt()).isEqualTo(now);
     assertThat(captor.getValue().performedBy()).isEqualTo(userId);
     assertThat(captor.getValue().quantityMl()).isNull();
@@ -77,25 +69,35 @@ class WaterPlantUseCaseHandlerTest {
   }
 
   @Test
-  void recordsOptionalQuantity() {
-    Plant plant =
-        Plant.create(
-            householdId,
-            SpeciesId.newId(),
-            LocationId.newId(),
-            "Monstera",
-            null,
-            null,
-            null,
-            userId,
-            now);
+  void archivedPlantThrows() {
+    Plant plant = plant(householdId).archive(now);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
 
-    handler.water(new WaterPlantCommand(userId, plant.id(), 250));
+    assertThatThrownBy(() -> handler.fertilize(new FertilizePlantCommand(userId, plant.id())))
+        .isInstanceOf(HouseholdAccessDeniedException.class);
+  }
 
-    ArgumentCaptor<CareEvent> captor = ArgumentCaptor.forClass(CareEvent.class);
-    then(careEventRepository).should().save(captor.capture());
-    assertThat(captor.getValue().quantityMl()).isEqualTo(250);
+  @Test
+  void plantFromOtherHouseholdThrows() {
+    Plant plant = plant(HouseholdId.newId());
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
+
+    assertThatThrownBy(() -> handler.fertilize(new FertilizePlantCommand(userId, plant.id())))
+        .isInstanceOf(HouseholdAccessDeniedException.class);
+  }
+
+  private Plant plant(HouseholdId household) {
+    return Plant.create(
+        household,
+        SpeciesId.newId(),
+        LocationId.newId(),
+        "Monstera",
+        null,
+        null,
+        null,
+        userId,
+        now);
   }
 }
