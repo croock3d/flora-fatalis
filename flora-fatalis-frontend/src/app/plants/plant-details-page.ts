@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { CareApiService } from '../care/care-api.service';
-import { PlantCareStatusDto } from '../care/care.dto';
+import { PlantCareStatusDto, PruningKind } from '../care/care.dto';
 import { LocationsApiService } from '../locations/locations-api.service';
 import { compressImage } from '../photos/compress-image';
 import { PlantPhotoDto } from '../photos/photo.dto';
@@ -47,9 +47,20 @@ export class PlantDetailsPage {
   protected readonly archiving = signal(false);
   protected readonly watering = signal(false);
   protected readonly fertilizing = signal(false);
+  protected readonly pruning = signal(false);
+  protected readonly showPruneForm = signal(false);
   protected readonly uploading = signal(false);
   protected readonly deletingEventId = signal<string | null>(null);
   protected readonly quantityMl = signal('');
+  protected readonly prunePerformedOn = signal(this.todayInWarsaw());
+  protected readonly pruneKind = signal<PruningKind | ''>('');
+  protected readonly pruneNotes = signal('');
+  protected readonly pruneKinds: { value: PruningKind; label: string }[] = [
+    { value: 'DRY_LEAVES', label: 'Suche/uszkodzone liście' },
+    { value: 'SHAPING', label: 'Formowanie' },
+    { value: 'HEAVY_PRUNING', label: 'Mocniejsze cięcie' },
+    { value: 'OTHER', label: 'Inne' },
+  ];
 
   constructor() {
     this.reload();
@@ -106,12 +117,66 @@ export class PlantDetailsPage {
     });
   }
 
+  protected openPruneForm(): void {
+    this.showPruneForm.set(true);
+    this.prunePerformedOn.set(this.todayInWarsaw());
+    this.pruneKind.set('');
+    this.pruneNotes.set('');
+  }
+
+  protected cancelPruneForm(): void {
+    this.showPruneForm.set(false);
+  }
+
+  protected setPrunePerformedOn(value: string): void {
+    this.prunePerformedOn.set(value);
+  }
+
+  protected setPruneKind(value: string): void {
+    this.pruneKind.set(value as PruningKind | '');
+  }
+
+  protected setPruneNotes(value: string): void {
+    this.pruneNotes.set(value);
+  }
+
+  protected prune(): void {
+    const performedOn = this.prunePerformedOn().trim();
+    if (!performedOn) {
+      this.error.set('Wybierz datę przycięcia');
+      return;
+    }
+    this.pruning.set(true);
+    this.careApi
+      .prune(this.plantId, {
+        performedOn,
+        pruningKind: this.pruneKind() || null,
+        notes: this.pruneNotes().trim() || null,
+      })
+      .subscribe({
+        next: () => {
+          this.pruning.set(false);
+          this.showPruneForm.set(false);
+          this.reloadHistory();
+        },
+        error: () => {
+          this.pruning.set(false);
+          this.error.set('Nie udało się oznaczyć przycinania');
+        },
+      });
+  }
+
+  protected pruningKindLabel(kind: PruningKind | null | undefined): string {
+    return this.pruneKinds.find((item) => item.value === kind)?.label ?? '';
+  }
+
   protected deleteEvent(event: PlantHistoryItemDto): void {
     this.deletingEventId.set(event.sourceId);
     this.careApi.deleteEvent(event.sourceId).subscribe({
       next: () => {
         this.deletingEventId.set(null);
         this.reloadHistory();
+        this.reloadCareStatus();
       },
       error: () => {
         this.deletingEventId.set(null);
@@ -252,6 +317,19 @@ export class PlantDetailsPage {
       day: 'numeric',
       month: 'long',
     }).format(new Date(year, month - 1, day));
+  }
+
+  protected todayInWarsaw(): string {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Warsaw',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+    const year = parts.find((part) => part.type === 'year')?.value;
+    const month = parts.find((part) => part.type === 'month')?.value;
+    const day = parts.find((part) => part.type === 'day')?.value;
+    return `${year}-${month}-${day}`;
   }
 
   private parseMl(raw: string | number | null | undefined): number | null | 'invalid' {

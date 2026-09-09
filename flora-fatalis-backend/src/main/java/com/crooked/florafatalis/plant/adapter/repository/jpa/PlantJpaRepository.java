@@ -10,4 +10,6 @@ public interface PlantJpaRepository extends JpaRepository<PlantEntity, UUID> {
   List<PlantEntity> findByHouseholdIdAndArchivedAtIsNull(UUID householdId);
 
   List<PlantEntity> findByHouseholdId(UUID householdId);
+
+  boolean existsByLocationIdAndArchivedAtIsNull(UUID locationId);
 }

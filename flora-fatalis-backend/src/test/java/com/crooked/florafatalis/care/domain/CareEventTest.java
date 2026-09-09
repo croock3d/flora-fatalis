@@ -24,6 +24,8 @@ class CareEventTest {
     assertThat(event.careType()).isEqualTo(CareType.WATERING);
     assertThat(event.quantityMl()).isNull();
     assertThat(event.source()).isEqualTo(CareSource.MANUAL);
+    assertThat(event.notes()).isNull();
+    assertThat(event.pruningKind()).isNull();
   }
 
   @Test
@@ -38,5 +40,53 @@ class CareEventTest {
                     0))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("quantityMl");
+  }
+
+  @Test
+  void pruningStoresOptionalKindAndNotes() {
+    CareEvent event =
+        CareEvent.pruning(
+            PlantId.newId(),
+            HouseholdId.newId(),
+            UserId.newId(),
+            Instant.parse("2026-01-10T08:00:00Z"),
+            PruningKind.SHAPING,
+            "  skrócone pędy  ");
+
+    assertThat(event.careType()).isEqualTo(CareType.PRUNING);
+    assertThat(event.pruningKind()).isEqualTo(PruningKind.SHAPING);
+    assertThat(event.notes()).isEqualTo("skrócone pędy");
+    assertThat(event.quantityMl()).isNull();
+    assertThat(event.source()).isEqualTo(CareSource.MANUAL);
+  }
+
+  @Test
+  void pruningAllowsMissingKindAndNotes() {
+    CareEvent event =
+        CareEvent.pruning(
+            PlantId.newId(),
+            HouseholdId.newId(),
+            UserId.newId(),
+            Instant.parse("2026-01-10T08:00:00Z"),
+            null,
+            "   ");
+
+    assertThat(event.pruningKind()).isNull();
+    assertThat(event.notes()).isNull();
+  }
+
+  @Test
+  void pruningRejectsNotesLongerThan500() {
+    assertThatThrownBy(
+            () ->
+                CareEvent.pruning(
+                    PlantId.newId(),
+                    HouseholdId.newId(),
+                    UserId.newId(),
+                    Instant.parse("2026-01-10T08:00:00Z"),
+                    PruningKind.OTHER,
+                    "x".repeat(501)))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("notes");
   }
 }

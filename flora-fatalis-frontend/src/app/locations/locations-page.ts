@@ -81,9 +81,13 @@ export class LocationsPage {
         this.saving.set(false);
         this.reload();
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.saving.set(false);
-        this.error.set('Nie udało się usunąć lokalizacji');
+        if (err.status === 409) {
+          this.error.set('Nie można usunąć lokalizacji, bo są do niej przypisane rośliny');
+        } else {
+          this.error.set('Nie udało się usunąć lokalizacji');
+        }
       },
     });
   }

@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-extend-species-fertilizing-columns
+      author: flora-fatalis
+      changes:
+        - addColumn:
+            tableName: species
+            columns:
+              - column:
+                  name: fertilizing_interval_min_days
+                  type: int
+              - column:
+                  name: fertilizing_interval_max_days
+                  type: int
+              - column:
+                  name: fertilizing_interval_label
+                  type: varchar(40)
+              - column:
+                  name: fertilizing_season
+                  type: varchar(80)
+              - column:
+                  name: fertilizer_type
+                  type: varchar(120)
+              - column:
+                  name: fertilizer_form
+                  type: varchar(40)
+              - column:
+                  name: fertilizing_notes
+                  type: varchar(240)
+              - column:
+                  name: fertilizing_rest_period
+                  type: varchar(80)
+  - changeSet:
+      id: 014-seed-species-fertilizing-details
+      author: flora-fatalis
+      changes:
+        - loadUpdateData:
+            tableName: species
+            primaryKey: id
+            relativeToChangelogFile: true
+            file: data/species-fertilizing-details.csv
+            encoding: UTF-8
+            separator: ','
+            quotchar: '"'

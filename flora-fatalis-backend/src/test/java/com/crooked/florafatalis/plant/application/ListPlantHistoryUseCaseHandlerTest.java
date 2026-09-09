@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import com.crooked.florafatalis.care.application.port.out.CareEventRepository;
 import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareType;
+import com.crooked.florafatalis.care.domain.PruningKind;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.location.domain.LocationId;
@@ -72,30 +73,45 @@ class ListPlantHistoryUseCaseHandlerTest {
     CareEvent fertilizing =
         CareEvent.fertilizing(
             plant.id(), householdId, userId, Instant.parse("2026-09-08T16:40:00Z"));
+    CareEvent pruning =
+        CareEvent.pruning(
+            plant.id(),
+            householdId,
+            userId,
+            Instant.parse("2026-09-08T15:00:00Z"),
+            PruningKind.SHAPING,
+            "formowanie");
     given(careEventRepository.findByPlantIdAndCareType(plant.id(), CareType.WATERING))
         .willReturn(List.of(wateringWithMl, wateringWithoutMl));
     given(careEventRepository.findByPlantIdAndCareType(plant.id(), CareType.FERTILIZING))
         .willReturn(List.of(fertilizing));
+    given(careEventRepository.findByPlantIdAndCareType(plant.id(), CareType.PRUNING))
+        .willReturn(List.of(pruning));
     given(plantPhotoRepository.findByPlantId(plant.id())).willReturn(List.of(photo));
 
     List<PlantHistoryItem> items = handler.list(userId, plant.id());
 
-    assertThat(items).hasSize(5);
+    assertThat(items).hasSize(6);
     assertThat(items)
         .extracting(PlantHistoryItem::type)
         .containsExactly(
             HistoryType.PHOTO,
             HistoryType.WATERING,
             HistoryType.FERTILIZING,
+            HistoryType.PRUNING,
             HistoryType.WATERING,
             HistoryType.CREATED);
     assertThat(items.get(0).sourceId()).isEqualTo(photo.id().value());
     assertThat(items.get(1).quantityMl()).isEqualTo(500);
     assertThat(items.get(2).type()).isEqualTo(HistoryType.FERTILIZING);
-    assertThat(items.get(3).quantityMl()).isNull();
-    assertThat(items.get(4).occurredAt()).isEqualTo(createdAt);
+    assertThat(items.get(3).type()).isEqualTo(HistoryType.PRUNING);
+    assertThat(items.get(3).pruningKind()).isEqualTo(PruningKind.SHAPING);
+    assertThat(items.get(3).notes()).isEqualTo("formowanie");
+    assertThat(items.get(4).quantityMl()).isNull();
+    assertThat(items.get(5).occurredAt()).isEqualTo(createdAt);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.WATERING).hasSize(2);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.FERTILIZING).hasSize(1);
+    assertThat(items).filteredOn(item -> item.type() == HistoryType.PRUNING).hasSize(1);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.PHOTO).hasSize(1);
     assertThat(items).filteredOn(item -> item.type() == HistoryType.CREATED).hasSize(1);
   }

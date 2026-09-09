@@ -49,4 +49,28 @@ public class SpeciesEntity {
 
   @Column(name = "default_fertilizing_interval_days")
   private Integer defaultFertilizingIntervalDays;
+
+  @Column(name = "fertilizing_interval_min_days")
+  private Integer fertilizingIntervalMinDays;
+
+  @Column(name = "fertilizing_interval_max_days")
+  private Integer fertilizingIntervalMaxDays;
+
+  @Column(name = "fertilizing_interval_label")
+  private String fertilizingIntervalLabel;
+
+  @Column(name = "fertilizing_season")
+  private String fertilizingSeason;
+
+  @Column(name = "fertilizer_type")
+  private String fertilizerType;
+
+  @Column(name = "fertilizer_form")
+  private String fertilizerForm;
+
+  @Column(name = "fertilizing_notes")
+  private String fertilizingNotes;
+
+  @Column(name = "fertilizing_rest_period")
+  private String fertilizingRestPeriod;
 }

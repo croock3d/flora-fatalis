@@ -41,16 +41,29 @@ public class ListPlantHistoryUseCaseHandler implements ListPlantHistoryUseCase {
     List<PlantHistoryItem> items = new ArrayList<>();
     items.add(
         new PlantHistoryItem(
-            HistoryType.CREATED, plant.createdAt(), plant.id().value(), null, plant.createdBy()));
+            HistoryType.CREATED,
+            plant.createdAt(),
+            plant.id().value(),
+            null,
+            plant.createdBy(),
+            null,
+            null));
     addCareEvents(items, plantId, CareType.WATERING, HistoryType.WATERING);
     addCareEvents(items, plantId, CareType.FERTILIZING, HistoryType.FERTILIZING);
+    addCareEvents(items, plantId, CareType.PRUNING, HistoryType.PRUNING);
     plantPhotoRepository
         .findByPlantId(plantId)
         .forEach(
             photo ->
                 items.add(
                     new PlantHistoryItem(
-                        HistoryType.PHOTO, photo.takenAt(), photo.id().value(), null, null)));
+                        HistoryType.PHOTO,
+                        photo.takenAt(),
+                        photo.id().value(),
+                        null,
+                        null,
+                        null,
+                        null)));
     items.sort(
         Comparator.comparing(PlantHistoryItem::occurredAt)
             .reversed()
@@ -70,6 +83,8 @@ public class ListPlantHistoryUseCaseHandler implements ListPlantHistoryUseCase {
                         event.performedAt(),
                         event.id().value(),
                         event.quantityMl(),
-                        event.performedBy())));
+                        event.performedBy(),
+                        event.notes(),
+                        event.pruningKind())));
   }
 }

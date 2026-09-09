@@ -25,3 +25,9 @@ databaseChangeLog:
       file: db/changelog/011-multi-household-membership.yml
   - include:
       file: db/changelog/012-add-fertilizing-intervals.yml
+  - include:
+      file: db/changelog/013-seed-fertilizing-intervals.yml
+  - include:
+      file: db/changelog/014-extend-species-fertilizing-details.yml
+  - include:
+      file: db/changelog/015-add-care-event-pruning-kind.yml

@@ -15,7 +15,8 @@ public record CareEvent(
     UserId performedBy,
     Integer quantityMl,
     CareSource source,
-    String notes) {
+    String notes,
+    PruningKind pruningKind) {
 
   public CareEvent {
     Objects.requireNonNull(id, "id must not be null");
@@ -28,6 +29,21 @@ public record CareEvent(
     if (quantityMl != null && quantityMl < 1) {
       throw new IllegalArgumentException("quantityMl must be at least 1");
     }
+    notes = normalizeNotes(notes);
+    if (pruningKind != null && careType != CareType.PRUNING) {
+      throw new IllegalArgumentException("pruningKind is only allowed for PRUNING");
+    }
+  }
+
+  private static String normalizeNotes(String notes) {
+    if (notes == null || notes.isBlank()) {
+      return null;
+    }
+    String stripped = notes.strip();
+    if (stripped.length() > 500) {
+      throw new IllegalArgumentException("notes must have at most 500 characters");
+    }
+    return stripped;
   }
 
   public static CareEvent watering(
@@ -45,6 +61,7 @@ public record CareEvent(
         performedBy,
         quantityMl,
         CareSource.MANUAL,
+        null,
         null);
   }
 
@@ -59,6 +76,27 @@ public record CareEvent(
         performedBy,
         null,
         CareSource.MANUAL,
+        null,
         null);
+  }
+
+  public static CareEvent pruning(
+      PlantId plantId,
+      HouseholdId householdId,
+      UserId performedBy,
+      Instant performedAt,
+      PruningKind pruningKind,
+      String notes) {
+    return new CareEvent(
+        CareEventId.newId(),
+        plantId,
+        householdId,
+        CareType.PRUNING,
+        performedAt,
+        performedBy,
+        null,
+        CareSource.MANUAL,
+        notes,
+        pruningKind);
   }
 }

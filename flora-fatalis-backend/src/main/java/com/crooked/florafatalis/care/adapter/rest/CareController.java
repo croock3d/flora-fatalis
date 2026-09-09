@@ -8,16 +8,18 @@ import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase
 import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase.CareDashboard;
 import com.crooked.florafatalis.care.application.port.in.GetPlantCareStatusUseCase;
 import com.crooked.florafatalis.care.application.port.in.GetPlantCareStatusUseCase.PlantCareStatus;
-import com.crooked.florafatalis.care.application.port.in.ListWateringHistoryUseCase;
+import com.crooked.florafatalis.care.application.port.in.PrunePlantUseCase;
+import com.crooked.florafatalis.care.application.port.in.PrunePlantUseCase.PrunePlantCommand;
 import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase;
 import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase.WaterPlantCommand;
 import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareEventId;
+import com.crooked.florafatalis.care.domain.PruningKind;
 import com.crooked.florafatalis.household.application.port.out.UserLookupPort;
 import com.crooked.florafatalis.plant.domain.PlantId;
 import com.crooked.florafatalis.shared.application.port.out.CurrentUserProvider;
 import java.time.Instant;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,7 +39,7 @@ class CareController {
 
   private final WaterPlantUseCase waterPlantUseCase;
   private final FertilizePlantUseCase fertilizePlantUseCase;
-  private final ListWateringHistoryUseCase listWateringHistoryUseCase;
+  private final PrunePlantUseCase prunePlantUseCase;
   private final DeleteCareEventUseCase deleteCareEventUseCase;
   private final GetCareDashboardUseCase getCareDashboardUseCase;
   private final GetPlantCareStatusUseCase getPlantCareStatusUseCase;
@@ -63,20 +65,26 @@ class CareController {
             new FertilizePlantCommand(currentUserProvider.currentUserId(), new PlantId(plantId))));
   }
 
+  @PostMapping("/plants/{plantId}/prune")
+  @ResponseStatus(HttpStatus.CREATED)
+  CareEventResponse prune(
+      @PathVariable UUID plantId, @RequestBody(required = false) PrunePlantRequest request) {
+    PrunePlantRequest body = request == null ? new PrunePlantRequest(null, null, null) : request;
+    return toResponse(
+        prunePlantUseCase.prune(
+            new PrunePlantCommand(
+                currentUserProvider.currentUserId(),
+                new PlantId(plantId),
+                body.performedOn(),
+                body.pruningKind(),
+                body.notes())));
+  }
+
   @DeleteMapping("/care-events/{eventId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void delete(@PathVariable UUID eventId) {
     deleteCareEventUseCase.delete(
         new DeleteCareEventCommand(currentUserProvider.currentUserId(), new CareEventId(eventId)));
-  }
-
-  @GetMapping("/plants/{plantId}/watering-history")
-  List<CareEventResponse> history(@PathVariable UUID plantId) {
-    return listWateringHistoryUseCase
-        .list(currentUserProvider.currentUserId(), new PlantId(plantId))
-        .stream()
-        .map(this::toResponse)
-        .toList();
   }
 
   @GetMapping("/dashboard")
@@ -97,10 +105,14 @@ class CareController {
         event.performedAt(),
         event.performedBy().value(),
         userLookupPort.findDisplayNameById(event.performedBy()),
-        event.quantityMl());
+        event.quantityMl(),
+        event.notes(),
+        event.pruningKind() == null ? null : event.pruningKind().name());
   }
 
   record WaterPlantRequest(Integer quantityMl) {}
+
+  record PrunePlantRequest(LocalDate performedOn, PruningKind pruningKind, String notes) {}
 
   record CareEventResponse(
       UUID id,
@@ -109,5 +121,7 @@ class CareController {
       Instant performedAt,
       UUID performedBy,
       String performedByName,
-      Integer quantityMl) {}
+      Integer quantityMl,
+      String notes,
+      String pruningKind) {}
 }

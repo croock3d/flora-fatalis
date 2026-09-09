@@ -37,6 +37,11 @@ public class PlantRepositoryAdapter implements PlantRepository {
         .toList();
   }
 
+  @Override
+  public boolean existsActiveByLocation(LocationId locationId) {
+    return jpaRepository.existsByLocationIdAndArchivedAtIsNull(locationId.value());
+  }
+
   private PlantEntity toEntity(Plant plant) {
     PlantEntity entity = new PlantEntity();
     entity.setId(plant.id().value());

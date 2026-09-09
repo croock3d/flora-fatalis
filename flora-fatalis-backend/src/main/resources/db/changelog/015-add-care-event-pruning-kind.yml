@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 015-add-care-event-pruning-kind
+      author: flora-fatalis
+      changes:
+        - addColumn:
+            tableName: care_events
+            columns:
+              - column:
+                  name: pruning_kind
+                  type: varchar(32)

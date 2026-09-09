@@ -12,7 +12,12 @@
     <dl class="details__meta">
       <div>
         <dt>Gatunek</dt>
-        <dd>{{ species()?.name }}</dd>
+        <dd>
+          {{ species()?.name }}
+          @if (species()?.latinName) {
+            <span class="details__latin">{{ species()?.latinName }}</span>
+          }
+        </dd>
       </div>
       <div>
         <dt>Lokalizacja</dt>
@@ -33,6 +38,39 @@
             Ostatnie: {{ careDate(fertilizingStatus.lastAt) }}
             <br />
             Następne: {{ careDate(fertilizingStatus.nextOn) }}
+          </dd>
+        </div>
+      }
+      @if (species()?.fertilizingIntervalLabel || species()?.fertilizerType || species()?.fertilizingSeason) {
+        <div>
+          <dt>Pielęgnacja gatunku</dt>
+          <dd>
+            @if (species()?.wateringIntervalLabel) {
+              💧 {{ species()?.wateringIntervalLabel }}
+              <br />
+            }
+            @if (species()?.fertilizingIntervalLabel) {
+              🌿 {{ species()?.fertilizingIntervalLabel }}
+              <br />
+            }
+            @if (species()?.fertilizingSeason) {
+              Sezon: {{ species()?.fertilizingSeason }}
+              <br />
+            }
+            @if (species()?.fertilizerType) {
+              {{ species()?.fertilizerType }}
+              @if (species()?.fertilizerForm) {
+                · {{ species()?.fertilizerForm }}
+              }
+              <br />
+            }
+            @if (species()?.fertilizingNotes) {
+              {{ species()?.fertilizingNotes }}
+              <br />
+            }
+            @if (species()?.fertilizingRestPeriod) {
+              Spoczynek: {{ species()?.fertilizingRestPeriod }}
+            }
           </dd>
         </div>
       }
@@ -60,6 +98,57 @@
     >
       {{ fertilizing() ? 'Zapisywanie...' : '🌿 Nawożono' }}
     </button>
+    @if (showPruneForm()) {
+      <form class="details__pruneForm" (ngSubmit)="prune()">
+        <label class="details__pruneLabel">
+          Data
+          <input
+            class="details__pruneInput"
+            type="date"
+            [ngModel]="prunePerformedOn()"
+            (ngModelChange)="setPrunePerformedOn($event)"
+            [max]="todayInWarsaw()"
+            name="prunePerformedOn"
+            required
+          />
+        </label>
+        <label class="details__pruneLabel">
+          Rodzaj
+          <select
+            class="details__pruneInput"
+            [ngModel]="pruneKind()"
+            (ngModelChange)="setPruneKind($event)"
+            name="pruneKind"
+          >
+            <option value="">Bez rodzaju</option>
+            @for (kind of pruneKinds; track kind.value) {
+              <option [value]="kind.value">{{ kind.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="details__pruneLabel">
+          Notatka (opcjonalnie)
+          <textarea
+            class="details__pruneNotes"
+            rows="3"
+            maxlength="500"
+            [ngModel]="pruneNotes()"
+            (ngModelChange)="setPruneNotes($event)"
+            name="pruneNotes"
+          ></textarea>
+        </label>
+        <div class="details__pruneActions">
+          <button class="details__prune" type="submit" [disabled]="pruning()">
+            {{ pruning() ? 'Zapisywanie...' : 'Zapisz przycinanie' }}
+          </button>
+          <button class="details__pruneCancel" type="button" (click)="cancelPruneForm()">
+            Anuluj
+          </button>
+        </div>
+      </form>
+    } @else {
+      <button class="details__prune" type="button" (click)="openPruneForm()">✂️ Przycięto</button>
+    }
 
     <div class="details__actions">
       <a class="details__edit" [routerLink]="['/plants', current.id, 'edit']">Edytuj</a>
@@ -109,6 +198,31 @@
                     [src]="photoUrls.objectUrl(event.photoUrl) | async"
                     alt="Zdjęcie z historii rośliny"
                   />
+                } @else if (event.type === 'PRUNING') {
+                  <div class="details__eventRow">
+                    <div>
+                      <p class="details__eventTitle">✂️ Przycinanie</p>
+                      <p class="details__historyMeta">
+                        {{ eventTime(event.occurredAt) }}
+                        @if (event.pruningKind) {
+                          · {{ pruningKindLabel(event.pruningKind) }}
+                        }
+                        @if (event.performedByName) {
+                          · {{ event.performedByName }}
+                        }
+                      </p>
+                      @if (event.notes) {
+                        <p class="details__historyMeta">{{ event.notes }}</p>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      [disabled]="deletingEventId() === event.sourceId"
+                      (click)="deleteEvent(event)"
+                    >
+                      Usuń
+                    </button>
+                  </div>
                 } @else if (event.type === 'FERTILIZING') {
                   <div class="details__eventRow">
                     <div>

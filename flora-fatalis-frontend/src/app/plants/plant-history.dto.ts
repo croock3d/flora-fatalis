@@ -1,4 +1,6 @@
-export type PlantHistoryType = 'WATERING' | 'FERTILIZING' | 'PHOTO' | 'CREATED';
+import { PruningKind } from '../care/care.dto';
+
+export type PlantHistoryType = 'WATERING' | 'FERTILIZING' | 'PRUNING' | 'PHOTO' | 'CREATED';
 
 export interface PlantHistoryItemDto {
   type: PlantHistoryType;
@@ -8,6 +10,8 @@ export interface PlantHistoryItemDto {
   performedBy: string | null;
   performedByName: string | null;
   photoUrl: string | null;
+  notes: string | null;
+  pruningKind: PruningKind | null;
 }
 
 export interface PlantHistoryDayGroup {

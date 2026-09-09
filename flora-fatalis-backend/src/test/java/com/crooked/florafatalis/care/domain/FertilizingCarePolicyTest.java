@@ -69,7 +69,25 @@ class FertilizingCarePolicyTest {
 
   private Species species(Integer fertilizingInterval) {
     return new Species(
-        speciesId, "Inny", null, 7, null, null, null, null, null, null, fertilizingInterval);
+        speciesId,
+        "Inny",
+        null,
+        7,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        fertilizingInterval,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
   }
 
   private Plant plant(Integer override) {

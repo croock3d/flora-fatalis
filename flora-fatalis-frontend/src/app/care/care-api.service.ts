@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { CareDashboardDto, CareEventDto, PlantCareStatusDto } from './care.dto';
+import { CareDashboardDto, CareEventDto, PlantCareStatusDto, PrunePlantRequest } from './care.dto';
 
 @Injectable({ providedIn: 'root' })
 export class CareApiService {
@@ -21,12 +21,12 @@ export class CareApiService {
     return this.http.post<CareEventDto>(`/api/plants/${plantId}/fertilize`, {});
   }
 
-  careStatus(plantId: string): Observable<PlantCareStatusDto> {
-    return this.http.get<PlantCareStatusDto>(`/api/plants/${plantId}/care-status`);
+  prune(plantId: string, request: PrunePlantRequest = {}): Observable<CareEventDto> {
+    return this.http.post<CareEventDto>(`/api/plants/${plantId}/prune`, request);
   }
 
-  history(plantId: string): Observable<CareEventDto[]> {
-    return this.http.get<CareEventDto[]>(`/api/plants/${plantId}/watering-history`);
+  careStatus(plantId: string): Observable<PlantCareStatusDto> {
+    return this.http.get<PlantCareStatusDto>(`/api/plants/${plantId}/care-status`);
   }
 
   deleteEvent(eventId: string): Observable<void> {

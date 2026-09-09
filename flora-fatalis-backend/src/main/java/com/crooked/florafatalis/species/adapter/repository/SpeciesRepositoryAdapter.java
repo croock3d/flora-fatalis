@@ -45,6 +45,14 @@ public class SpeciesRepositoryAdapter implements SpeciesRepository {
         entity.getLightPreference(),
         entity.getHumidityPreference(),
         entity.getCategory(),
-        entity.getDefaultFertilizingIntervalDays());
+        entity.getDefaultFertilizingIntervalDays(),
+        entity.getFertilizingIntervalMinDays(),
+        entity.getFertilizingIntervalMaxDays(),
+        entity.getFertilizingIntervalLabel(),
+        entity.getFertilizingSeason(),
+        entity.getFertilizerType(),
+        entity.getFertilizerForm(),
+        entity.getFertilizingNotes(),
+        entity.getFertilizingRestPeriod());
   }
 }

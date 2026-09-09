@@ -65,7 +65,9 @@ class CreatePlantUseCaseHandlerTest {
     given(speciesRepository.findById(speciesId))
         .willReturn(
             Optional.of(
-                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null, null)));
+                new Species(
+                    speciesId, "Inny", null, 7, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null)));
     given(locationRepository.findById(locationId))
         .willReturn(
             Optional.of(new Location(locationId, householdId, "Salon", LocationKind.INDOOR)));
@@ -113,7 +115,9 @@ class CreatePlantUseCaseHandlerTest {
     given(speciesRepository.findById(speciesId))
         .willReturn(
             Optional.of(
-                new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null, null)));
+                new Species(
+                    speciesId, "Inny", null, 7, null, null, null, null, null, null, null, null,
+                    null, null, null, null, null, null, null)));
     given(locationRepository.findById(locationId))
         .willReturn(
             Optional.of(

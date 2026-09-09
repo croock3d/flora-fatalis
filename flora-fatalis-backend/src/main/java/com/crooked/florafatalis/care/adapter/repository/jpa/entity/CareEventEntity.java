@@ -44,4 +44,7 @@ public class CareEventEntity {
 
   @Column(name = "notes")
   private String notes;
+
+  @Column(name = "pruning_kind")
+  private String pruningKind;
 }

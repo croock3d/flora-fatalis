@@ -120,7 +120,9 @@ class PlantController {
         item.quantityMl(),
         item.performedBy() == null ? null : item.performedBy().value(),
         performedByName,
-        photoUrl);
+        photoUrl,
+        item.notes(),
+        item.pruningKind() == null ? null : item.pruningKind().name());
   }
 
   private PlantResponse toResponse(Plant plant) {
@@ -162,5 +164,7 @@ class PlantController {
       Integer quantityMl,
       UUID performedBy,
       String performedByName,
-      String photoUrl) {}
+      String photoUrl,
+      String notes,
+      String pruningKind) {}
 }

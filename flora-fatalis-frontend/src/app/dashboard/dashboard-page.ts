@@ -1,5 +1,4 @@
-import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -8,7 +7,7 @@ import { CareDashboardDto, DashboardItemDto } from '../care/care.dto';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',
 })
@@ -20,6 +19,12 @@ export class DashboardPage {
   protected readonly error = signal<string | null>(null);
   protected readonly wateringPlantId = signal<string | null>(null);
   protected readonly quantityDrafts = signal<Record<string, string>>({});
+  protected readonly hasOverdue = computed(() => (this.dashboard()?.overdue.length ?? 0) > 0);
+  protected readonly hasAnyTasks = computed(() => {
+    const data = this.dashboard();
+    if (!data) return false;
+    return data.overdue.length + data.dueToday.length + data.upcoming.length > 0;
+  });
 
   constructor() {
     this.reload();
@@ -40,6 +45,14 @@ export class DashboardPage {
 
   protected itemKey(item: DashboardItemDto): string {
     return item.plantId + item.careType;
+  }
+
+  protected dueDate(iso: string): string {
+    return new Intl.DateTimeFormat('pl-PL', {
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'Europe/Warsaw',
+    }).format(new Date(`${iso}T12:00:00`));
   }
 
   protected water(item: DashboardItemDto): void {

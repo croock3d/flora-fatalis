@@ -5,6 +5,7 @@ import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdAlreadyExistsException;
 import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
 import com.crooked.florafatalis.household.domain.NoActiveHouseholdException;
+import com.crooked.florafatalis.location.domain.LocationInUseException;
 import com.crooked.florafatalis.location.domain.LocationNotFoundException;
 import com.crooked.florafatalis.photo.domain.PlantPhotoNotFoundException;
 import com.crooked.florafatalis.plant.domain.PlantNotFoundException;
@@ -43,6 +44,12 @@ class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.CONFLICT)
   ErrorResponse handleNoActiveHousehold() {
     return new ErrorResponse("No active household");
+  }
+
+  @ExceptionHandler(LocationInUseException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  ErrorResponse handleLocationInUse() {
+    return new ErrorResponse("Location is in use");
   }
 
   @ExceptionHandler(LocationNotFoundException.class)

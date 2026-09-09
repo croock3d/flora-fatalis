@@ -10,4 +10,12 @@ export interface SpeciesDto {
   humidityPreference: string | null;
   category: string | null;
   defaultFertilizingIntervalDays: number | null;
+  fertilizingIntervalMinDays: number | null;
+  fertilizingIntervalMaxDays: number | null;
+  fertilizingIntervalLabel: string | null;
+  fertilizingSeason: string | null;
+  fertilizerType: string | null;
+  fertilizerForm: string | null;
+  fertilizingNotes: string | null;
+  fertilizingRestPeriod: string | null;
 }

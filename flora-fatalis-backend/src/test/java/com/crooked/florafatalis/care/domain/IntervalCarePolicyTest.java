@@ -19,7 +19,9 @@ class IntervalCarePolicyTest {
   private final IntervalCarePolicy policy = new IntervalCarePolicy();
   private final SpeciesId speciesId = SpeciesId.newId();
   private final Species species =
-      new Species(speciesId, "Inny", null, 7, null, null, null, null, null, null, null);
+      new Species(
+          speciesId, "Inny", null, 7, null, null, null, null, null, null, null, null, null, null,
+          null, null, null, null, null);
   private final LocalDate today = LocalDate.parse("2026-01-10");
 
   @Test

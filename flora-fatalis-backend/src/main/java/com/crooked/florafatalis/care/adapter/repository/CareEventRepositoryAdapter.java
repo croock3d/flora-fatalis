@@ -7,6 +7,7 @@ import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareEventId;
 import com.crooked.florafatalis.care.domain.CareSource;
 import com.crooked.florafatalis.care.domain.CareType;
+import com.crooked.florafatalis.care.domain.PruningKind;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.plant.domain.PlantId;
 import com.crooked.florafatalis.shared.domain.UserId;
@@ -76,6 +77,7 @@ public class CareEventRepositoryAdapter implements CareEventRepository {
     entity.setQuantityMl(event.quantityMl());
     entity.setSource(event.source().name());
     entity.setNotes(event.notes());
+    entity.setPruningKind(event.pruningKind() == null ? null : event.pruningKind().name());
     return entity;
   }
 
@@ -89,6 +91,7 @@ public class CareEventRepositoryAdapter implements CareEventRepository {
         new UserId(entity.getPerformedBy()),
         entity.getQuantityMl(),
         CareSource.valueOf(entity.getSource()),
-        entity.getNotes());
+        entity.getNotes(),
+        entity.getPruningKind() == null ? null : PruningKind.valueOf(entity.getPruningKind()));
   }
 }

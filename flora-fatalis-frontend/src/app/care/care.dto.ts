@@ -1,3 +1,5 @@
+export type PruningKind = 'DRY_LEAVES' | 'SHAPING' | 'HEAVY_PRUNING' | 'OTHER';
+
 export interface CareEventDto {
   id: string;
   plantId: string;
@@ -6,6 +8,14 @@ export interface CareEventDto {
   performedBy: string;
   performedByName: string;
   quantityMl: number | null;
+  notes: string | null;
+  pruningKind: PruningKind | null;
+}
+
+export interface PrunePlantRequest {
+  performedOn?: string | null;
+  pruningKind?: PruningKind | null;
+  notes?: string | null;
 }
 
 export interface DashboardItemDto {

@@ -1,0 +1,32 @@
+id,fertilizing_interval_min_days,fertilizing_interval_max_days,fertilizing_interval_label,fertilizing_season,fertilizer_type,fertilizer_form,fertilizing_notes,fertilizing_rest_period
+00000000-0000-0000-0000-000000000011,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000012,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000013,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000014,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000015,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,umiarkowane nawożenie zgodnie z etykietą,październik–luty
+00000000-0000-0000-0000-000000000016,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,umiarkowane nawożenie zgodnie z etykietą,październik–luty
+00000000-0000-0000-0000-000000000017,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000018,42,56,42–56 dni,kwiecień–wrzesień,do kaktusów i sukulentów,płynny,"słabe nawożenie, unikać przenawożenia",październik–marzec
+00000000-0000-0000-0000-000000000019,28,42,28–42 dni,kwiecień–wrzesień,do roślin zielonych,płynny,umiarkowane lub słabe nawożenie,październik–marzec
+00000000-0000-0000-0000-000000000020,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000021,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych / kwitnących,płynny,umiarkowane; nie nawozić przesuszonego podłoża,październik–luty
+00000000-0000-0000-0000-000000000022,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,słabsze stężenie niż maksymalne z etykiety,październik–luty
+00000000-0000-0000-0000-000000000023,14,28,14–28 dni,marzec–wrzesień,do roślin zielonych,płynny,słabsze stężenie i umiarkowana częstotliwość,październik–luty
+00000000-0000-0000-0000-000000000024,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000025,21,35,21–35 dni,marzec–wrzesień,do roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000026,28,56,28–56 dni,kwiecień–wrzesień,do kaktusów i sukulentów,płynny,"słabe stężenie, tylko przy aktywnym wzroście",październik–marzec
+00000000-0000-0000-0000-000000000027,28,56,28–56 dni,kwiecień–wrzesień,do kaktusów i sukulentów,płynny,"słabe stężenie, unikać przenawożenia",październik–marzec
+00000000-0000-0000-0000-000000000028,42,56,42–56 dni,kwiecień–wrzesień,do kaktusów i sukulentów,płynny,bardzo umiarkowane nawożenie,październik–marzec
+00000000-0000-0000-0000-000000000029,28,56,28–56 dni,kwiecień–wrzesień,do kaktusów i sukulentów,płynny,"słabe stężenie, tylko przy aktywnym wzroście",październik–marzec
+00000000-0000-0000-0000-000000000030,21,35,21–35 dni,marzec–wrzesień,do palm / roślin zielonych,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000031,14,28,14–28 dni,marzec–wrzesień,do ziół / warzyw,płynny,"nawóz dopuszczony do ziół, zgodnie z etykietą",październik–luty
+00000000-0000-0000-0000-000000000032,14,21,14–21 dni,marzec–wrzesień,do ziół / warzyw,płynny,zgodnie z etykietą; nie przekraczać dawki,październik–luty
+00000000-0000-0000-0000-000000000033,28,42,28–42 dni,marzec–wrzesień,do ziół / warzyw,płynny,umiarkowane nawożenie,październik–luty
+00000000-0000-0000-0000-000000000034,28,42,28–42 dni,marzec–wrzesień,do ziół / warzyw,płynny,umiarkowane nawożenie,październik–luty
+00000000-0000-0000-0000-000000000035,14,28,14–28 dni,marzec–wrzesień,do ziół / warzyw,płynny,zgodnie z etykietą producenta,październik–luty
+00000000-0000-0000-0000-000000000036,7,14,7–14 dni,kwiecień–wrzesień,do roślin kwitnących,płynny,"regularnie w sezonie, zgodnie z etykietą",październik–marzec
+00000000-0000-0000-0000-000000000037,7,14,7–14 dni,maj–wrzesień,do roślin kwitnących,płynny,"regularnie w okresie wzrostu, zgodnie z etykietą",październik–kwiecień
+00000000-0000-0000-0000-000000000038,7,14,7–14 dni,maj–wrzesień,do roślin kwitnących,płynny,"regularnie w sezonie, zgodnie z etykietą",październik–kwiecień
+00000000-0000-0000-0000-000000000039,28,42,28–42 dni,kwiecień–wrzesień,do ziół / roślin śródziemnomorskich,płynny,"umiarkowane nawożenie, unikać nadmiaru azotu",październik–marzec
+00000000-0000-0000-0000-000000000040,7,14,7–14 dni,kwiecień–wrzesień,do pomidorów / warzyw,płynny,w okresie owocowania zgodnie z etykietą,październik–marzec
+00000000-0000-0000-0000-000000000041,14,21,14–21 dni,kwiecień–wrzesień,do pomidorów / warzyw,płynny,w okresie owocowania zgodnie z etykietą,październik–marzec

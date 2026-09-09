@@ -31,7 +31,15 @@ class SpeciesController {
                     species.lightPreference(),
                     species.humidityPreference(),
                     species.category(),
-                    species.defaultFertilizingIntervalDays()))
+                    species.defaultFertilizingIntervalDays(),
+                    species.fertilizingIntervalMinDays(),
+                    species.fertilizingIntervalMaxDays(),
+                    species.fertilizingIntervalLabel(),
+                    species.fertilizingSeason(),
+                    species.fertilizerType(),
+                    species.fertilizerForm(),
+                    species.fertilizingNotes(),
+                    species.fertilizingRestPeriod()))
         .toList();
   }
 
@@ -46,5 +54,13 @@ class SpeciesController {
       String lightPreference,
       String humidityPreference,
       String category,
-      Integer defaultFertilizingIntervalDays) {}
+      Integer defaultFertilizingIntervalDays,
+      Integer fertilizingIntervalMinDays,
+      Integer fertilizingIntervalMaxDays,
+      String fertilizingIntervalLabel,
+      String fertilizingSeason,
+      String fertilizerType,
+      String fertilizerForm,
+      String fertilizingNotes,
+      String fertilizingRestPeriod) {}
 }

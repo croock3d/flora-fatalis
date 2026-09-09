@@ -13,7 +13,15 @@ public record Species(
     String lightPreference,
     String humidityPreference,
     String category,
-    Integer defaultFertilizingIntervalDays) {
+    Integer defaultFertilizingIntervalDays,
+    Integer fertilizingIntervalMinDays,
+    Integer fertilizingIntervalMaxDays,
+    String fertilizingIntervalLabel,
+    String fertilizingSeason,
+    String fertilizerType,
+    String fertilizerForm,
+    String fertilizingNotes,
+    String fertilizingRestPeriod) {
 
   public Species {
     Objects.requireNonNull(id, "id must not be null");

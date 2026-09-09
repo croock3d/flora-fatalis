@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-seed-fertilizing-intervals
+      author: flora-fatalis
+      changes:
+        - loadUpdateData:
+            tableName: species
+            primaryKey: id
+            relativeToChangelogFile: true
+            file: data/species-fertilizing.csv
+            encoding: UTF-8
+            separator: ','
+            quotchar: '"'

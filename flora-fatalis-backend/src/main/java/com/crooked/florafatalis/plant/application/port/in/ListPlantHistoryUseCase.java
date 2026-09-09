@@ -1,5 +1,6 @@
 package com.crooked.florafatalis.plant.application.port.in;
 
+import com.crooked.florafatalis.care.domain.PruningKind;
 import com.crooked.florafatalis.plant.domain.PlantId;
 import com.crooked.florafatalis.shared.domain.UserId;
 import java.time.Instant;
@@ -13,6 +14,7 @@ public interface ListPlantHistoryUseCase {
   enum HistoryType {
     WATERING,
     FERTILIZING,
+    PRUNING,
     PHOTO,
     CREATED
   }
@@ -22,5 +24,7 @@ public interface ListPlantHistoryUseCase {
       Instant occurredAt,
       UUID sourceId,
       Integer quantityMl,
-      UserId performedBy) {}
+      UserId performedBy,
+      String notes,
+      PruningKind pruningKind) {}
 }

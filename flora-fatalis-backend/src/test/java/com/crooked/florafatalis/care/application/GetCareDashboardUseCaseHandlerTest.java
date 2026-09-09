@@ -2,6 +2,8 @@ package com.crooked.florafatalis.care.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase.CareDashboard;
 import com.crooked.florafatalis.care.application.port.out.CareEventRepository;
@@ -46,7 +48,26 @@ class GetCareDashboardUseCaseHandlerTest {
   private final HouseholdId householdId = HouseholdId.newId();
   private final SpeciesId speciesId = SpeciesId.newId();
   private final Species species =
-      new Species(speciesId, "Monstera", null, 7, null, null, null, null, null, null, null);
+      new Species(
+          speciesId,
+          "Monstera",
+          null,
+          7,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null);
 
   @BeforeEach
   void setUp() {
@@ -107,9 +128,11 @@ class GetCareDashboardUseCaseHandlerTest {
 
     assertThat(dashboard.overdue()).hasSize(1);
     assertThat(dashboard.overdue().getFirst().plantName()).isEqualTo("Monstera");
+    assertThat(dashboard.overdue().getFirst().careType()).isEqualTo("WATERING");
     assertThat(dashboard.overdue().getFirst().overdueDays()).isEqualTo(2);
     assertThat(dashboard.dueToday()).extracting(item -> item.plantName()).containsExactly("Fikus");
     assertThat(dashboard.upcoming()).extracting(item -> item.plantName()).containsExactly("Aloes");
+    assertThat(dashboard.upcoming().getFirst().dueOn()).isEqualTo(LocalDate.parse("2026-01-12"));
   }
 
   @Test
@@ -136,7 +159,26 @@ class GetCareDashboardUseCaseHandlerTest {
   @Test
   void includesFertilizingTasksSeparatelyFromWatering() {
     Species fertilizingSpecies =
-        new Species(speciesId, "Monstera", null, 7, null, null, null, null, null, null, 30);
+        new Species(
+            speciesId,
+            "Monstera",
+            null,
+            7,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            30,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     Plant plant = plant("Fikus", null);
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of(plant));
@@ -163,7 +205,7 @@ class GetCareDashboardUseCaseHandlerTest {
   }
 
   @Test
-  void archivedPlantsAreExcludedBecauseRepositoryReturnsActiveOnly() {
+  void returnsEmptyWhenHouseholdHasNoActivePlants() {
     given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
     given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of());
     given(speciesRepository.findAll()).willReturn(List.of(species));
@@ -176,6 +218,80 @@ class GetCareDashboardUseCaseHandlerTest {
 
     assertThat(dashboard.overdue()).isEmpty();
     assertThat(dashboard.dueToday()).isEmpty();
+    assertThat(dashboard.upcoming()).isEmpty();
+  }
+
+  @Test
+  void noActiveHouseholdReturnsEmptyDashboard() {
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.empty());
+
+    CareDashboard dashboard = handler.get(userId);
+
+    assertThat(dashboard.overdue()).isEmpty();
+    assertThat(dashboard.dueToday()).isEmpty();
+    assertThat(dashboard.upcoming()).isEmpty();
+    then(plantRepository).shouldHaveNoInteractions();
+  }
+
+  @Test
+  void usesOnlyPlantsFromActiveHousehold() {
+    HouseholdId otherHousehold = HouseholdId.newId();
+    Plant own = plant("Monstera", null);
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of(own));
+    given(speciesRepository.findAll()).willReturn(List.of(species));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
+        .willReturn(
+            List.of(
+                CareEvent.watering(
+                    own.id(), householdId, userId, Instant.parse("2026-01-03T08:00:00Z"), null)));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(List.of());
+
+    CareDashboard dashboard = handler.get(userId);
+
+    assertThat(dashboard.dueToday())
+        .extracting(item -> item.plantName())
+        .containsExactly("Monstera");
+    then(plantRepository).should().findActiveByHousehold(householdId);
+    then(plantRepository).should(never()).findActiveByHousehold(otherHousehold);
+    then(careEventRepository)
+        .should()
+        .findLatestByHouseholdAndCareType(householdId, CareType.WATERING);
+    then(careEventRepository)
+        .should(never())
+        .findLatestByHouseholdAndCareType(otherHousehold, CareType.WATERING);
+  }
+
+  @Test
+  void bucketsTasksUsingEuropeWarsawDay() {
+    Instant lateUtc = Instant.parse("2026-01-09T23:30:00Z");
+    GetCareDashboardUseCaseHandler warsawHandler =
+        new GetCareDashboardUseCaseHandler(
+            plantRepository,
+            speciesRepository,
+            careEventRepository,
+            new IntervalCarePolicy(),
+            new FertilizingCarePolicy(),
+            activeHouseholdPort,
+            Clock.fixed(lateUtc, ZoneOffset.UTC));
+    ReflectionTestUtils.setField(warsawHandler, "timezone", "Europe/Warsaw");
+    Plant plant = plant("Fikus", null);
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findActiveByHousehold(householdId)).willReturn(List.of(plant));
+    given(speciesRepository.findAll()).willReturn(List.of(species));
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.FERTILIZING))
+        .willReturn(List.of());
+    given(careEventRepository.findLatestByHouseholdAndCareType(householdId, CareType.WATERING))
+        .willReturn(
+            List.of(
+                CareEvent.watering(
+                    plant.id(), householdId, userId, Instant.parse("2026-01-03T11:00:00Z"), null)));
+
+    CareDashboard dashboard = warsawHandler.get(userId);
+
+    assertThat(dashboard.dueToday()).extracting(item -> item.plantName()).containsExactly("Fikus");
+    assertThat(dashboard.overdue()).isEmpty();
     assertThat(dashboard.upcoming()).isEmpty();
   }
 

@@ -51,6 +51,14 @@
   color: #111827;
 }
 
+.details__latin {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-style: italic;
+  color: #6b7280;
+}
+
 .details__actions {
   display: flex;
   flex-wrap: wrap;
@@ -61,6 +69,7 @@
 .details__archive,
 .details__water,
 .details__fertilize,
+.details__prune,
 .details__upload {
   height: 42px;
   padding: 0 16px;
@@ -114,6 +123,73 @@
   background: #365314;
   color: #ffffff;
   border: none;
+  cursor: pointer;
+}
+
+.details__prune {
+  width: 100%;
+  margin-bottom: 12px;
+  background: #3f6212;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.details__pruneForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.details__pruneLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.details__pruneInput,
+.details__pruneNotes {
+  height: 42px;
+  padding: 0 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-family: inherit;
+}
+
+.details__pruneNotes {
+  height: auto;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.details__pruneActions {
+  display: flex;
+  gap: 8px;
+}
+
+.details__pruneActions .details__prune {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.details__pruneCancel {
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
 }
 
