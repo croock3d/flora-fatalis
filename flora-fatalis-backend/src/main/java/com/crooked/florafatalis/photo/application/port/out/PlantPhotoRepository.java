@@ -1,5 +1,6 @@
 package com.crooked.florafatalis.photo.application.port.out;
 
+import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.photo.domain.PlantPhoto;
 import com.crooked.florafatalis.photo.domain.PlantPhotoId;
 import com.crooked.florafatalis.plant.domain.PlantId;
@@ -15,6 +16,8 @@ public interface PlantPhotoRepository {
   List<PlantPhoto> findByPlantId(PlantId plantId);
 
   Optional<PlantPhoto> findPrimaryByPlantId(PlantId plantId);
+
+  List<PlantPhoto> findPrimaryByHouseholdId(HouseholdId householdId);
 
   void delete(PlantPhotoId id);
 }

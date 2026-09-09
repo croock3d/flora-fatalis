@@ -149,6 +149,25 @@ button {
   color: var(--color-terracotta);
 }
 
+.empty {
+  max-width: 36ch;
+}
+
+.empty__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--color-charcoal);
+}
+
+.empty__text {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-md);
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -600px 0;

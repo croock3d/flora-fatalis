@@ -24,6 +24,7 @@ export interface DashboardItemDto {
   careType: 'WATERING' | 'FERTILIZING';
   dueOn: string;
   overdueDays: number;
+  primaryPhotoUrl?: string | null;
 }
 
 export interface CareTypeStatusDto {

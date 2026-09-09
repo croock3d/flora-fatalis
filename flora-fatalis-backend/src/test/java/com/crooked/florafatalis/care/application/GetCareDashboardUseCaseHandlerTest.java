@@ -3,6 +3,7 @@ package com.crooked.florafatalis.care.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 
 import com.crooked.florafatalis.care.application.port.in.GetCareDashboardUseCase.CareDashboard;
@@ -13,6 +14,7 @@ import com.crooked.florafatalis.care.domain.FertilizingCarePolicy;
 import com.crooked.florafatalis.care.domain.IntervalCarePolicy;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.location.domain.LocationId;
+import com.crooked.florafatalis.photo.application.port.out.PlantPhotoRepository;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
 import com.crooked.florafatalis.plant.domain.Plant;
 import com.crooked.florafatalis.shared.application.port.out.ActiveHouseholdPort;
@@ -40,6 +42,7 @@ class GetCareDashboardUseCaseHandlerTest {
   @Mock private SpeciesRepository speciesRepository;
   @Mock private CareEventRepository careEventRepository;
   @Mock private ActiveHouseholdPort activeHouseholdPort;
+  @Mock private PlantPhotoRepository plantPhotoRepository;
 
   private GetCareDashboardUseCaseHandler handler;
 
@@ -79,8 +82,12 @@ class GetCareDashboardUseCaseHandlerTest {
             new IntervalCarePolicy(),
             new FertilizingCarePolicy(),
             activeHouseholdPort,
+            plantPhotoRepository,
             Clock.fixed(now, ZoneOffset.UTC));
     ReflectionTestUtils.setField(handler, "timezone", "UTC");
+    lenient()
+        .when(plantPhotoRepository.findPrimaryByHouseholdId(householdId))
+        .thenReturn(List.of());
   }
 
   @Test
@@ -274,6 +281,7 @@ class GetCareDashboardUseCaseHandlerTest {
             new IntervalCarePolicy(),
             new FertilizingCarePolicy(),
             activeHouseholdPort,
+            plantPhotoRepository,
             Clock.fixed(lateUtc, ZoneOffset.UTC));
     ReflectionTestUtils.setField(warsawHandler, "timezone", "Europe/Warsaw");
     Plant plant = plant("Fikus", null);

@@ -8,6 +8,7 @@ export interface PlantDto {
   acquiredAt: string | null;
   archivedAt: string | null;
   createdAt: string;
+  primaryPhotoUrl?: string | null;
 }
 
 export interface PlantRequest {

@@ -41,6 +41,13 @@ public class PlantPhotoRepositoryAdapter implements PlantPhotoRepository {
   }
 
   @Override
+  public List<PlantPhoto> findPrimaryByHouseholdId(HouseholdId householdId) {
+    return jpaRepository.findByHouseholdIdAndPrimaryIsTrue(householdId.value()).stream()
+        .map(this::toDomain)
+        .toList();
+  }
+
+  @Override
   public void delete(PlantPhotoId id) {
     jpaRepository.deleteById(id.value());
   }

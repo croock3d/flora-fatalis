@@ -13,4 +13,6 @@ public interface PlantPhotoJpaRepository extends JpaRepository<PlantPhotoEntity,
   Optional<PlantPhotoEntity> findFirstByPlantIdAndPrimaryIsTrue(UUID plantId);
 
   List<PlantPhotoEntity> findByHouseholdId(UUID householdId);
+
+  List<PlantPhotoEntity> findByHouseholdIdAndPrimaryIsTrue(UUID householdId);
 }

@@ -47,7 +47,10 @@
   @if (loading()) {
     <p class="locations__muted">Ładowanie...</p>
   } @else if (locations().length === 0) {
-    <p class="locations__muted">Brak lokalizacji. Dodaj pierwsze miejsce, zanim dodasz roślinę.</p>
+    <div class="empty">
+      <p class="empty__title">Dodaj pierwsze miejsce</p>
+      <p class="empty__text">Salon, balkon, łazienka — rośliny muszą mieć gdzie mieszkać.</p>
+    </div>
   } @else {
     <ul class="locations__list">
       @for (location of locations(); track location.id) {

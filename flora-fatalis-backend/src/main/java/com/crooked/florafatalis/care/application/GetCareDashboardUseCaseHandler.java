@@ -8,6 +8,8 @@ import com.crooked.florafatalis.care.domain.CareRecommendation;
 import com.crooked.florafatalis.care.domain.CareType;
 import com.crooked.florafatalis.care.domain.FertilizingCarePolicy;
 import com.crooked.florafatalis.household.domain.HouseholdId;
+import com.crooked.florafatalis.photo.application.port.out.PlantPhotoRepository;
+import com.crooked.florafatalis.photo.domain.PlantPhoto;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
 import com.crooked.florafatalis.plant.domain.Plant;
 import com.crooked.florafatalis.plant.domain.PlantId;
@@ -42,6 +44,7 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
   private final CarePolicy carePolicy;
   private final FertilizingCarePolicy fertilizingCarePolicy;
   private final ActiveHouseholdPort activeHouseholdPort;
+  private final PlantPhotoRepository plantPhotoRepository;
   private final Clock clock;
 
   @Value("${app.timezone:Europe/Warsaw}")
@@ -64,6 +67,7 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
             .collect(Collectors.toMap(Species::id, Function.identity()));
     Map<PlantId, CareEvent> latestWatering = latestByPlant(householdId, CareType.WATERING);
     Map<PlantId, CareEvent> latestFertilizing = latestByPlant(householdId, CareType.FERTILIZING);
+    Map<PlantId, String> primaryPhotoUrls = primaryPhotoUrls(householdId);
     List<DashboardItem> overdue = new ArrayList<>();
     List<DashboardItem> dueToday = new ArrayList<>();
     List<DashboardItem> upcoming = new ArrayList<>();
@@ -76,7 +80,13 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
           overdue,
           dueToday,
           upcoming,
-          wateringItem(plant, species, latestWatering.get(plant.id()), today, zone),
+          wateringItem(
+              plant,
+              species,
+              latestWatering.get(plant.id()),
+              today,
+              zone,
+              primaryPhotoUrls.get(plant.id())),
           today);
       fertilizingCarePolicy
           .recommend(
@@ -91,7 +101,12 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
                       overdue,
                       dueToday,
                       upcoming,
-                      item(plant, CareType.FERTILIZING, recommendation, today),
+                      item(
+                          plant,
+                          CareType.FERTILIZING,
+                          recommendation,
+                          today,
+                          primaryPhotoUrls.get(plant.id())),
                       today));
     }
     overdue.sort(
@@ -104,17 +119,40 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
   }
 
   private DashboardItem wateringItem(
-      Plant plant, Species species, CareEvent last, LocalDate today, ZoneId zone) {
+      Plant plant,
+      Species species,
+      CareEvent last,
+      LocalDate today,
+      ZoneId zone,
+      String primaryPhotoUrl) {
     Optional<Instant> lastAt = Optional.ofNullable(last).map(CareEvent::performedAt);
     CareRecommendation recommendation = carePolicy.recommend(plant, species, lastAt, today, zone);
-    return item(plant, CareType.WATERING, recommendation, today);
+    return item(plant, CareType.WATERING, recommendation, today, primaryPhotoUrl);
   }
 
   private DashboardItem item(
-      Plant plant, CareType careType, CareRecommendation recommendation, LocalDate today) {
+      Plant plant,
+      CareType careType,
+      CareRecommendation recommendation,
+      LocalDate today,
+      String primaryPhotoUrl) {
     long days = ChronoUnit.DAYS.between(recommendation.dueOn(), today);
     return DashboardItem.of(
-        plant.id(), plant.name(), careType.name(), recommendation.dueOn(), (int) Math.max(days, 0));
+        plant.id(),
+        plant.name(),
+        careType.name(),
+        recommendation.dueOn(),
+        (int) Math.max(days, 0),
+        primaryPhotoUrl);
+  }
+
+  private Map<PlantId, String> primaryPhotoUrls(HouseholdId householdId) {
+    return plantPhotoRepository.findPrimaryByHouseholdId(householdId).stream()
+        .collect(
+            Collectors.toMap(
+                PlantPhoto::plantId,
+                photo -> "/api/photos/" + photo.id().value(),
+                (left, right) -> left));
   }
 
   private void addItem(

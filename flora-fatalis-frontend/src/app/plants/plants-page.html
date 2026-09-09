@@ -4,7 +4,9 @@
       <p class="plants__kicker">Gospodarstwo</p>
       <h1 class="plants__title">Rośliny</h1>
     </div>
-    <a class="btn" routerLink="/plants/new">Dodaj roślinę</a>
+    @if (plants().length > 0) {
+      <a class="btn" routerLink="/plants/new">Dodaj roślinę</a>
+    }
   </header>
 
   @if (error()) {
@@ -14,12 +16,31 @@
   @if (loading()) {
     <p class="plants__muted">Ładowanie...</p>
   } @else if (plants().length === 0) {
-    <p class="plants__muted">Brak roślin. Dodaj pierwszą albo najpierw utwórz lokalizację.</p>
+    <div class="empty">
+      <p class="empty__title">Dodaj pierwszą roślinę</p>
+      <p class="empty__text">
+        @if (locations().length === 0) {
+          Najpierw utwórz lokalizację, potem dodaj roślinę do gospodarstwa.
+        } @else {
+          Kolekcja jest pusta. Nadaj roślinie nazwę, gatunek i miejsce.
+        }
+      </p>
+      @if (locations().length === 0) {
+        <a class="btn" routerLink="/locations">Dodaj lokalizację</a>
+      } @else {
+        <a class="btn" routerLink="/plants/new">Dodaj roślinę</a>
+      }
+    </div>
   } @else {
     <ul class="plants__list">
       @for (plant of plants(); track plant.id) {
         <li>
           <a class="plants__item" [routerLink]="['/plants', plant.id]">
+            <div class="plants__photo">
+              @if (plant.primaryPhotoUrl; as url) {
+                <img [src]="photoUrls.objectUrl(url) | async" alt="" />
+              }
+            </div>
             <p class="plants__name">{{ plant.name }}</p>
             @if (speciesLatin(plant.speciesId); as latin) {
               <p class="plants__latin">{{ latin }}</p>

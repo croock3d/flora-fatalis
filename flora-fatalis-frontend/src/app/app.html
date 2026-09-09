@@ -13,7 +13,7 @@
 
       <nav class="app__nav" aria-label="Nawigacja">
         <a class="app__navLink" routerLink="/dashboard" routerLinkActive="active">Dzisiaj</a>
-        <a class="app__navLink" routerLink="/plants" routerLinkActive="active">Rośliny</a>
+        <a class="app__navLink" routerLink="/plants" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Rośliny</a>
       </nav>
 
       <div class="app__userSection">
@@ -89,7 +89,7 @@
   @if (isAuthenticated()) {
     <nav class="app__bottomNav" aria-label="Nawigacja">
       <a class="app__bottomNavLink" routerLink="/dashboard" routerLinkActive="app__bottomNavLink--active">Dzisiaj</a>
-      <a class="app__bottomNavLink" routerLink="/plants" routerLinkActive="app__bottomNavLink--active">Rośliny</a>
+      <a class="app__bottomNavLink" routerLink="/plants" routerLinkActive="app__bottomNavLink--active" [routerLinkActiveOptions]="{ exact: true }">Rośliny</a>
       <a class="app__bottomNavLink" routerLink="/plants/new" routerLinkActive="app__bottomNavLink--active">Dodaj</a>
     </nav>
   }

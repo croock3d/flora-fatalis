@@ -1,18 +1,21 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { CareApiService } from '../care/care-api.service';
 import { CareDashboardDto, DashboardItemDto } from '../care/care.dto';
+import { PhotoUrlService } from '../photos/photo-url.service';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [RouterLink, FormsModule],
+  imports: [AsyncPipe, RouterLink, FormsModule],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',
 })
 export class DashboardPage {
   private readonly api = inject(CareApiService);
+  protected readonly photoUrls = inject(PhotoUrlService);
 
   protected readonly dashboard = signal<CareDashboardDto | null>(null);
   protected readonly loading = signal(true);

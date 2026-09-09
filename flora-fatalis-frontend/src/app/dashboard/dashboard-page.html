@@ -12,14 +12,23 @@
     <p class="dash__muted">Ładowanie...</p>
   } @else if (dashboard(); as data) {
     @if (!hasAnyTasks()) {
-      <p class="dash__empty">Nie masz zaplanowanych zadań na najbliższe dni.</p>
+      <div class="empty">
+        <p class="empty__title">Nic do zrobienia</p>
+        <p class="empty__text">Żadna roślina nie wymaga dziś pielęgnacji. Wróć, gdy pojawi się podlewanie albo nawożenie.</p>
+        <a class="btn btn--ghost" routerLink="/plants">Zobacz rośliny</a>
+      </div>
     } @else {
       @if (todayItems().length === 0) {
-        <p class="dash__muted">Nic na dzisiaj.</p>
+        <p class="dash__muted">Nic na dzisiaj. Najbliższe zadania są poniżej.</p>
       } @else {
         <ul class="dash__list">
           @for (item of todayItems(); track itemKey(item)) {
             <li class="dash__row" [class.dash__row--overdue]="item.overdueDays > 0">
+              <a class="dash__thumb" [routerLink]="['/plants', item.plantId]" [attr.aria-label]="item.plantName">
+                @if (item.primaryPhotoUrl; as url) {
+                  <img [src]="photoUrls.objectUrl(url) | async" alt="" />
+                }
+              </a>
               <div class="dash__identity">
                 <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
                 <p
@@ -79,6 +88,11 @@
           <ul class="dash__list dash__list--quiet">
             @for (item of data.upcoming; track itemKey(item)) {
               <li class="dash__row dash__row--quiet">
+                <a class="dash__thumb" [routerLink]="['/plants', item.plantId]" [attr.aria-label]="item.plantName">
+                  @if (item.primaryPhotoUrl; as url) {
+                    <img [src]="photoUrls.objectUrl(url) | async" alt="" />
+                  }
+                </a>
                 <div class="dash__identity">
                   <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
                   <p class="dash__status">{{ careLabel(item.careType) }} · {{ dueDate(item.dueOn) }}</p>

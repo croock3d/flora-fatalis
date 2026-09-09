@@ -2,6 +2,8 @@ package com.crooked.florafatalis.plant.adapter.rest;
 
 import com.crooked.florafatalis.household.application.port.out.UserLookupPort;
 import com.crooked.florafatalis.location.domain.LocationId;
+import com.crooked.florafatalis.photo.application.port.out.PlantPhotoRepository;
+import com.crooked.florafatalis.photo.domain.PlantPhoto;
 import com.crooked.florafatalis.plant.application.port.in.ArchivePlantUseCase;
 import com.crooked.florafatalis.plant.application.port.in.ArchivePlantUseCase.ArchivePlantCommand;
 import com.crooked.florafatalis.plant.application.port.in.CreatePlantUseCase;
@@ -19,7 +21,9 @@ import com.crooked.florafatalis.shared.application.port.out.CurrentUserProvider;
 import com.crooked.florafatalis.species.domain.SpeciesId;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,19 +49,30 @@ class PlantController {
   private final ListPlantHistoryUseCase listPlantHistoryUseCase;
   private final CurrentUserProvider currentUserProvider;
   private final UserLookupPort userLookupPort;
+  private final PlantPhotoRepository plantPhotoRepository;
 
   @GetMapping
   List<PlantResponse> list() {
-    return listPlantsUseCase.list(currentUserProvider.currentUserId()).stream()
-        .map(this::toResponse)
-        .toList();
+    List<Plant> plants = listPlantsUseCase.list(currentUserProvider.currentUserId());
+    if (plants.isEmpty()) {
+      return List.of();
+    }
+    Map<PlantId, String> photoUrls =
+        plantPhotoRepository.findPrimaryByHouseholdId(plants.getFirst().householdId()).stream()
+            .collect(
+                Collectors.toMap(
+                    PlantPhoto::plantId,
+                    photo -> "/api/photos/" + photo.id().value(),
+                    (left, right) -> left));
+    return plants.stream().map(plant -> toResponse(plant, photoUrls.get(plant.id()))).toList();
   }
 
   @GetMapping("/{id}")
   PlantResponse get(@PathVariable UUID id) {
-    return toResponse(
+    Plant plant =
         getPlantUseCase.get(
-            new GetPlantCommand(currentUserProvider.currentUserId(), new PlantId(id))));
+            new GetPlantCommand(currentUserProvider.currentUserId(), new PlantId(id)));
+    return toResponse(plant, photoUrl(plant.id()));
   }
 
   @GetMapping("/{id}/history")
@@ -72,7 +87,7 @@ class PlantController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   PlantResponse create(@RequestBody PlantRequest request) {
-    return toResponse(
+    Plant plant =
         createPlantUseCase.create(
             new CreatePlantCommand(
                 currentUserProvider.currentUserId(),
@@ -81,12 +96,13 @@ class PlantController {
                 request.name(),
                 request.wateringIntervalDaysOverride(),
                 request.fertilizingIntervalDaysOverride(),
-                request.acquiredAt())));
+                request.acquiredAt()));
+    return toResponse(plant, photoUrl(plant.id()));
   }
 
   @PutMapping("/{id}")
   PlantResponse update(@PathVariable UUID id, @RequestBody PlantRequest request) {
-    return toResponse(
+    Plant plant =
         updatePlantUseCase.update(
             new UpdatePlantCommand(
                 currentUserProvider.currentUserId(),
@@ -96,7 +112,8 @@ class PlantController {
                 request.name(),
                 request.wateringIntervalDaysOverride(),
                 request.fertilizingIntervalDaysOverride(),
-                request.acquiredAt())));
+                request.acquiredAt()));
+    return toResponse(plant, photoUrl(plant.id()));
   }
 
   @DeleteMapping("/{id}")
@@ -125,7 +142,14 @@ class PlantController {
         item.pruningKind() == null ? null : item.pruningKind().name());
   }
 
-  private PlantResponse toResponse(Plant plant) {
+  private String photoUrl(PlantId plantId) {
+    return plantPhotoRepository
+        .findPrimaryByPlantId(plantId)
+        .map(photo -> "/api/photos/" + photo.id().value())
+        .orElse(null);
+  }
+
+  private PlantResponse toResponse(Plant plant, String primaryPhotoUrl) {
     return new PlantResponse(
         plant.id().value(),
         plant.speciesId().value(),
@@ -135,7 +159,8 @@ class PlantController {
         plant.fertilizingIntervalDaysOverride(),
         plant.acquiredAt(),
         plant.archivedAt(),
-        plant.createdAt());
+        plant.createdAt(),
+        primaryPhotoUrl);
   }
 
   record PlantRequest(
@@ -155,7 +180,8 @@ class PlantController {
       Integer fertilizingIntervalDaysOverride,
       Instant acquiredAt,
       Instant archivedAt,
-      Instant createdAt) {}
+      Instant createdAt,
+      String primaryPhotoUrl) {}
 
   record PlantHistoryResponse(
       String type,

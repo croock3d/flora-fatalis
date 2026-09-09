@@ -91,7 +91,8 @@ describe('DashboardPage', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.textContent).toContain('Nie masz zaplanowanych zadań na najbliższe dni.');
+    expect(compiled.textContent).toContain('Nic do zrobienia');
+    expect(compiled.textContent).toContain('Zobacz rośliny');
     expect(compiled.querySelectorAll('.dash__row').length).toBe(0);
   });
 
@@ -158,8 +159,6 @@ describe('DashboardPage', () => {
 
     expect(careApi.fertilize).toHaveBeenCalledWith('plant-2');
     expect(careApi.dashboard.mock.calls.length).toBeGreaterThanOrEqual(2);
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain(
-      'Nie masz zaplanowanych zadań na najbliższe dni.',
-    );
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nic do zrobienia');
   });
 });
