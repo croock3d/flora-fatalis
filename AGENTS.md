@@ -2,6 +2,8 @@
 
 Prywatna web/PWA do wspólnego zarządzania roślinami (2 osoby, household). Wzorzec: projekt `dietty` (katalog obok).
 
+**Loop CORE:** zaloguj się → (ew. partner) → lokalizacje i rośliny → dashboard „Dzisiaj” → podlej → historia.
+
 ## Stack
 
 - Frontend: Angular 21, CSS, service worker, Vitest
@@ -11,15 +13,25 @@ Prywatna web/PWA do wspólnego zarządzania roślinami (2 osoby, household). Wzo
 - Pakiet: `com.crooked.florafatalis`
 - Katalogi: `flora-fatalis-backend/`, `flora-fatalis-frontend/`
 
-Kopiuj konwencje z dietty. Nie dodawaj warstw, których tam nie ma. Po każdej skończonej funkcjonalności zrób commit.
+Kopiuj konwencje z dietty. Nie dodawaj warstw, których tam nie ma. Po każdej skończonej funkcjonalności zrób commit. **Nie przebudowuj Dockera** po każdej zmianie.
 
-## Uruchomienie
+## Uruchomienie (dev — to jest domyślny tryb pracy)
+
+Postgres w Dockerze, reszta lokalnie (hot reload, bez rebuildu obrazu):
 
 ```bash
-docker compose up -d --build   # http://localhost:8080
+docker compose up -d postgres                          # Postgres na :5433
+cd flora-fatalis-backend && ./mvnw spring-boot:run    # :8080
+cd flora-fatalis-frontend && nvm use 22 && npm start  # :4200, proxy /api → :8080
 ```
 
-Dev bez Dockera: Postgres (`docker compose up -d postgres` nie wystarczy — w compose Postgres nie jest wystawiony na hosta), `./mvnw spring-boot:run` w backendzie, `nvm use 22 && npm start` we frontendzie.
+Frontend: http://localhost:4200
+
+Pełny obraz (frontend w Springu) tylko gdy chcesz sprawdzić paczkę:
+
+```bash
+docker compose --profile packaged up -d --build   # http://localhost:8080
+```
 
 Dev login: `dev@flora-fatalis.local` / `devpass`
 
@@ -29,18 +41,33 @@ Testy: `./mvnw test` (backend), `nvm use 22 && npx ng test --watch=false` (front
 
 - Dane roślin i historii należą do **aktywnego householdu**, nie do usera.
 - Pielęgnacja = `care_events` + wymienna `CarePolicy`. Nie zapisuj `next_watering_at` jako faktu.
-- MVP podlewania: `IntervalCarePolicy` (gatunek ± override na roślinie). Dashboard liczy dziś/zaległe/wkrótce.
-- Zdjęcia: port `PhotoStorage` (dev/prod Docker: dysk + volume). Kompresja po stronie klienta.
-- Roślin nie kasuj twardo — `archived_at`.
+- Podlewanie (CORE): `IntervalCarePolicy` (gatunek ± override na roślinie). Dashboard liczy dziś/zaległe/wkrótce (7 dni).
+- Nawożenie (MVP+): `FertilizingCarePolicy` (gatunek ± override). Sezon, spoczynek i typ nawozu w katalogu są **tylko informacją** — nie sterują schedulerem. Nie zmieniaj schedulera nawożenia, chyba że user prosi.
+- Przycinanie (MVP+): dziennik (`PRUNING` + opcjonalnie `pruning_kind` / `notes`). **Bez** terminów i bez pozycji na dashboardzie.
+- Zdjęcia (MVP+): port `PhotoStorage` (dev/prod Docker: dysk + volume). Kompresja po stronie klienta.
+- Roślin nie kasuj twardo — `archived_at`. Unarchive / lista archiwum = Future.
 - Strefa dashboardu: `Europe/Warsaw`.
+- Household: max 2 osoby (owner + 1 partner).
+- Gatunków nie zmyślaj i nie dawaj userowi CRUD — seed Liquibase (`009-seed-species-catalog.yml` plus późniejsze seed-y nawożenia `012`–`014`). Katalog read-only + „Inny”.
 
-## Gotowe w MVP
+Future hooks w modelu (nie implementować): `CareSource.HA` / `SENSOR` / `SYSTEM`; port `PhotoStorage` pod cloud.
 
-Auth, household (invite), species (katalog + „Inny”), locations, plants CRUD, zdjęcia, podlewanie, dashboard, PWA shell, Docker Compose.
+## CORE MVP
 
-## Poza MVP (nie implementuj, chyba że user prosi)
+Auth, household 2-osobowy (własne HH + invite partnera + switch + leave), lokalizacje, gatunki (katalog + „Inny”), rośliny (lista, dodanie, edycja, szczegóły, archiwizacja jednokierunkowa), podlewanie (event + wyliczanie kolejnego terminu + override), dashboard „Dzisiaj”, historia rośliny, household scoping, timezone Europe/Warsaw, Docker Compose.
 
-Push, nawożenie, przesadzanie, przycinanie, notatki, sensory, HA, pogoda, ilość wody w UI (`quantity_ml` może zostać puste), Cloudinary/R2.
+## MVP+ (jest w kodzie i UI — nie usuwać, nie rozbudowywać bez prośby)
+
+- Nawożenie: event, terminy na dashboardzie, override na roślinie. Sezon/spoczynek/typ nawozu = tekst katalogu.
+- Przycinanie: log na karcie rośliny i timeline. Bez schedulera.
+- Zdjęcia: upload, galeria, primary, delete.
+- Opcjonalne `quantity_ml` przy podlewaniu (nie wchodzi do wyliczania terminu).
+- PWA shell (manifest + service worker assetów; to nie jest offline-first).
+- Wygody household poza minimalnym 2-osobowym loopem (np. switch między własnym a partnerskim HH).
+
+## Future (nie implementuj, chyba że user prosi)
+
+Push / przypomnienia, Home Assistant, sensory, pogoda, adaptive watering, AI / analiza zdjęć, cloud photo storage (Cloudinary/R2), offline-first, przesadzanie, ogólne notatki (poza notatką przycinania), CRUD gatunków, unarchive / lista archiwum, zmiana hasła/profilu, >2 osoby w household, terminy przycinania.
 
 ## Frontend
 
@@ -48,4 +75,4 @@ Feature foldery: `auth`, `household`, `plants`, `species`, `locations`, `dashboa
 
 ## Backend
 
-Moduły: `user`, `household`, `species`, `location`, `plant`, `care`, `photo`, `shared`. Gatunków nie zmyślaj — seed w Liquibase (`009-seed-species-catalog.yml`).
+Moduły: `user`, `household`, `species`, `location`, `plant`, `care`, `photo`, `shared`. `care` obsługuje `WATERING` (CORE), `FERTILIZING` i `PRUNING` (MVP+).

@@ -5,6 +5,8 @@ services:
       POSTGRES_DB: flora_fatalis
       POSTGRES_USER: postgress
       POSTGRES_PASSWORD: postgress
+    ports:
+      - "5433:5432"
     volumes:
       - flora_pg:/var/lib/postgresql/data
     healthcheck:
@@ -14,6 +16,7 @@ services:
       retries: 10
 
   app:
+    profiles: ["packaged"]
     build: .
     ports:
       - "8080:8080"

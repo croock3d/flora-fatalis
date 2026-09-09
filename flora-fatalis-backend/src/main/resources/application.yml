@@ -2,7 +2,7 @@ spring:
   application:
     name: flora-fatalis
   datasource:
-    url: jdbc:postgresql://localhost:5432/flora_fatalis
+    url: jdbc:postgresql://localhost:5433/flora_fatalis
     username: postgress
     password: postgress
     driver-class-name: org.postgresql.Driver
