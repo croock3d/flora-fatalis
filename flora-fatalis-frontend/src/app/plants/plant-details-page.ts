@@ -6,6 +6,7 @@ import { forkJoin } from 'rxjs';
 
 import { CareApiService } from '../care/care-api.service';
 import { PlantCareStatusDto, PruningKind } from '../care/care.dto';
+import { parseQuantityMl } from '../care/parse-quantity-ml';
 import { LocationsApiService } from '../locations/locations-api.service';
 import { compressImage } from '../photos/compress-image';
 import { PlantPhotoDto } from '../photos/photo.dto';
@@ -80,6 +81,7 @@ export class PlantDetailsPage {
   }
 
   protected archive(): void {
+    this.error.set(null);
     this.archiving.set(true);
     this.plantsApi.archive(this.plantId).subscribe({
       next: () => this.router.navigateByUrl('/plants'),
@@ -95,11 +97,12 @@ export class PlantDetailsPage {
   }
 
   protected water(): void {
-    const quantityMl = this.parseMl(this.quantityMl());
+    const quantityMl = parseQuantityMl(this.quantityMl());
     if (quantityMl === 'invalid') {
       this.error.set('Ilość wody musi być liczbą całkowitą większą od 0');
       return;
     }
+    this.error.set(null);
     this.watering.set(true);
     this.careApi.water(this.plantId, quantityMl).subscribe({
       next: () => {
@@ -116,6 +119,7 @@ export class PlantDetailsPage {
   }
 
   protected fertilize(): void {
+    this.error.set(null);
     this.fertilizing.set(true);
     this.careApi.fertilize(this.plantId).subscribe({
       next: () => {
@@ -159,6 +163,7 @@ export class PlantDetailsPage {
       this.error.set('Wybierz datę przycięcia');
       return;
     }
+    this.error.set(null);
     this.pruning.set(true);
     this.careApi
       .prune(this.plantId, {
@@ -192,6 +197,7 @@ export class PlantDetailsPage {
   }
 
   protected deleteEvent(event: PlantHistoryItemDto): void {
+    this.error.set(null);
     this.deletingEventId.set(event.sourceId);
     this.pendingDeleteId.set(null);
     this.careApi.deleteEvent(event.sourceId).subscribe({
@@ -202,7 +208,7 @@ export class PlantDetailsPage {
       },
       error: () => {
         this.deletingEventId.set(null);
-        this.error.set('Nie udało się usunąć podlewania');
+        this.error.set('Nie udało się usunąć wpisu');
       },
     });
   }
@@ -211,6 +217,7 @@ export class PlantDetailsPage {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.error.set(null);
     this.uploading.set(true);
     try {
       const compressed = await compressImage(file);
@@ -232,6 +239,7 @@ export class PlantDetailsPage {
   }
 
   protected setPrimary(photo: PlantPhotoDto): void {
+    this.error.set(null);
     this.photosApi.setPrimary(photo.id).subscribe({
       next: () => this.reloadPhotos(),
       error: () => this.error.set('Nie udało się ustawić zdjęcia głównego'),
@@ -239,6 +247,7 @@ export class PlantDetailsPage {
   }
 
   protected deletePhoto(photo: PlantPhotoDto): void {
+    this.error.set(null);
     this.photosApi.delete(photo.id).subscribe({
       next: () => this.reloadPhotos(),
       error: () => this.error.set('Nie udało się usunąć zdjęcia'),
@@ -271,16 +280,25 @@ export class PlantDetailsPage {
   }
 
   private reloadPhotos(): void {
-    this.photosApi.list(this.plantId).subscribe((photos) => this.photos.set(photos));
+    this.photosApi.list(this.plantId).subscribe({
+      next: (photos) => this.photos.set(photos),
+      error: () => this.error.set('Nie udało się odświeżyć zdjęć'),
+    });
     this.reloadHistory();
   }
 
   private reloadHistory(): void {
-    this.plantsApi.history(this.plantId).subscribe((history) => this.history.set(history));
+    this.plantsApi.history(this.plantId).subscribe({
+      next: (history) => this.history.set(history),
+      error: () => this.error.set('Nie udało się odświeżyć historii'),
+    });
   }
 
   private reloadCareStatus(): void {
-    this.careApi.careStatus(this.plantId).subscribe((status) => this.careStatus.set(status));
+    this.careApi.careStatus(this.plantId).subscribe({
+      next: (status) => this.careStatus.set(status),
+      error: () => this.error.set('Nie udało się odświeżyć statusu pielęgnacji'),
+    });
   }
 
   protected careDate(iso: string | null | undefined): string {
@@ -411,26 +429,6 @@ export class PlantDetailsPage {
   }
 
   protected todayInWarsaw(): string {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Europe/Warsaw',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).formatToParts(new Date());
-    const year = parts.find((part) => part.type === 'year')?.value;
-    const month = parts.find((part) => part.type === 'month')?.value;
-    const day = parts.find((part) => part.type === 'day')?.value;
-    return `${year}-${month}-${day}`;
-  }
-
-  private parseMl(raw: string | number | null | undefined): number | null | 'invalid' {
-    if (raw == null || raw === '') {
-      return null;
-    }
-    const quantityMl = typeof raw === 'number' ? raw : Number(String(raw).trim());
-    if (!Number.isInteger(quantityMl) || quantityMl < 1) {
-      return 'invalid';
-    }
-    return quantityMl;
+    return this.dayKey(new Date().toISOString());
   }
 }

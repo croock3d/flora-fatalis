@@ -32,6 +32,7 @@ export class PlantFormPage {
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
+  private acquiredAt: string | null = null;
 
   protected readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(1)]],
@@ -72,6 +73,7 @@ export class PlantFormPage {
         if (this.plantId) {
           this.plantsApi.get(this.plantId).subscribe({
             next: (plant) => {
+              this.acquiredAt = plant.acquiredAt;
               this.form.patchValue({
                 name: plant.name,
                 speciesId: plant.speciesId,
@@ -114,7 +116,7 @@ export class PlantFormPage {
       locationId: value.locationId,
       wateringIntervalDaysOverride: override ? Number(override) : null,
       fertilizingIntervalDaysOverride: fertilizingOverride ? Number(fertilizingOverride) : null,
-      acquiredAt: null,
+      acquiredAt: this.acquiredAt,
     };
 
     this.saving.set(true);

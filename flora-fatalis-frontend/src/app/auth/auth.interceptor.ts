@@ -3,6 +3,8 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
+import { HouseholdStore } from '../household/household.store';
+import { AUTH_TOKEN_KEY } from './auth.service';
 import { AuthStore } from './auth.store';
 
 export const authInterceptor: HttpInterceptorFn = (
@@ -10,6 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn,
 ) => {
   const authStore = inject(AuthStore);
+  const householdStore = inject(HouseholdStore);
   const router = inject(Router);
   const user = authStore.currentUser();
 
@@ -24,8 +27,9 @@ export const authInterceptor: HttpInterceptorFn = (
   return next(authReq).pipe(
     catchError((err) => {
       if (err?.status === HttpStatusCode.Unauthorized) {
-        localStorage.removeItem('auth_token');
+        localStorage.removeItem(AUTH_TOKEN_KEY);
         authStore.clear();
+        householdStore.clear();
         router.navigate(['/login']);
       }
       return throwError(() => err);

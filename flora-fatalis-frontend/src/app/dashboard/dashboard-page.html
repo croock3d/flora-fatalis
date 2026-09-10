@@ -27,8 +27,8 @@
             </a>
             <div class="dash__identity">
               <a class="dash__plant" [routerLink]="['/plants', item.plantId]">{{ item.plantName }}</a>
-              @if (locationFor(item)) {
-                <p class="dash__place">{{ locationFor(item) }}</p>
+              @if (item.locationName) {
+                <p class="dash__place">{{ item.locationName }}</p>
               }
             </div>
             <p
@@ -60,19 +60,19 @@
                 <button
                   class="btn"
                   type="button"
-                  [disabled]="wateringPlantId() === itemKey(item)"
+                  [disabled]="mutatingKey() === itemKey(item)"
                   (click)="water(item)"
                 >
-                  {{ wateringPlantId() === itemKey(item) ? '...' : 'Podlej' }}
+                  {{ mutatingKey() === itemKey(item) ? '...' : 'Podlej' }}
                 </button>
               } @else {
                 <button
                   class="btn"
                   type="button"
-                  [disabled]="wateringPlantId() === itemKey(item)"
+                  [disabled]="mutatingKey() === itemKey(item)"
                   (click)="fertilize(item)"
                 >
-                  {{ wateringPlantId() === itemKey(item) ? '...' : 'Nawieź' }}
+                  {{ mutatingKey() === itemKey(item) ? '...' : 'Nawieź' }}
                 </button>
               }
             </div>

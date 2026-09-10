@@ -14,9 +14,6 @@ export class HouseholdStore {
   readonly status = computed(() => this._status());
   readonly loaded = computed(() => this._loaded());
   readonly hasPendingInvitation = computed(() => !!this._status()?.incomingInvitation);
-  readonly activeHousehold = computed(
-    () => this._status()?.households.find((household) => household.active) ?? null,
-  );
 
   load(): void {
     this.api

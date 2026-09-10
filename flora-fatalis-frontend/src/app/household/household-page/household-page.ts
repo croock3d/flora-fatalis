@@ -40,6 +40,7 @@ export class HouseholdPage {
     this.api.sendInvitation(email).subscribe({
       next: () => {
         this.successMessage.set('Zaproszenie wysłane!');
+        this.inviteEmail.set('');
         this.store.load();
         this.loading.set(false);
       },

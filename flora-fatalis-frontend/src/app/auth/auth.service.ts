@@ -6,7 +6,7 @@ import { HouseholdStore } from '../household/household.store';
 import { AuthResponse, LoginRequest, RegisterRequest } from './auth.dto';
 import { AuthStore } from './auth.store';
 
-const TOKEN_KEY = 'auth_token';
+export const AUTH_TOKEN_KEY = 'auth_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -31,13 +31,13 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
     this.authStore.clear();
     this.householdStore.clear();
   }
 
   private handleAuthResponse(response: AuthResponse): void {
-    localStorage.setItem(TOKEN_KEY, response.token);
+    localStorage.setItem(AUTH_TOKEN_KEY, response.token);
     this.authStore.setUser({
       userId: response.userId,
       displayName: response.displayName,
@@ -47,28 +47,28 @@ export class AuthService {
   }
 
   private restoreSession(): void {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) return;
 
     try {
       const payload = this.parseJwtPayload(token);
       const exp = payload['exp'];
       if (exp && Date.now() / 1000 > Number(exp)) {
-        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(AUTH_TOKEN_KEY);
         return;
       }
       this.authStore.setUser({
-        userId: payload['sub'],
-        displayName: payload['displayName'] ?? payload['name'] ?? '',
+        userId: String(payload['sub'] ?? ''),
+        displayName: String(payload['displayName'] ?? ''),
         token,
       });
       this.householdStore.load();
     } catch {
-      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(AUTH_TOKEN_KEY);
     }
   }
 
-  private parseJwtPayload(token: string): Record<string, string> {
+  private parseJwtPayload(token: string): Record<string, unknown> {
     const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
     const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
     const json = new TextDecoder('utf-8').decode(bytes);

@@ -1,6 +1,5 @@
 :root {
   --color-ivory: #f3efe6;
-  --color-paper: #faf7f0;
   --color-surface: #fffcf7;
   --color-sand: #e8dfd0;
   --color-charcoal: #1c1917;
@@ -27,7 +26,6 @@
 
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 14px;
 
   --shadow-sm: 0 1px 2px rgba(28, 25, 23, 0.04);
   --shadow-md: 0 10px 28px rgba(28, 25, 23, 0.06);
@@ -41,7 +39,6 @@
   --fs-2xl: 1.75rem;
 
   --ease: 160ms ease;
-  --header-height: 64px;
   --bottom-nav-height: 64px;
 }
 
@@ -137,18 +134,6 @@ button {
   background: #8a4633;
 }
 
-.alert {
-  font-size: var(--fs-md);
-  font-weight: 500;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-sm);
-}
-
-.alert--error {
-  background: var(--color-terracotta-soft);
-  color: var(--color-terracotta);
-}
-
 .empty {
   max-width: 36ch;
 }
@@ -166,29 +151,6 @@ button {
   font-size: var(--fs-md);
   color: var(--color-muted);
   line-height: 1.5;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -600px 0;
-  }
-  100% {
-    background-position: 600px 0;
-  }
-}
-
-.skeleton {
-  border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--color-sand) 25%, #efe6d6 50%, var(--color-sand) 75%);
-  background-size: 1200px 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
-    background: var(--color-sand);
-  }
 }
 
 @keyframes spin {

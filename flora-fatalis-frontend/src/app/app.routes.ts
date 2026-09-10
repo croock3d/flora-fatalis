@@ -53,4 +53,5 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./plants/plant-details-page').then((m) => m.PlantDetailsPage),
   },
+  { path: '**', redirectTo: 'dashboard' },
 ];

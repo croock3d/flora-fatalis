@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PhotoUrlService {
@@ -10,10 +10,7 @@ export class PhotoUrlService {
   objectUrl(apiUrl: string): Observable<string> {
     const cached = this.urls.get(apiUrl);
     if (cached) {
-      return new Observable((subscriber) => {
-        subscriber.next(cached);
-        subscriber.complete();
-      });
+      return of(cached);
     }
     return this.http.get(apiUrl, { responseType: 'blob' }).pipe(
       map((blob) => {

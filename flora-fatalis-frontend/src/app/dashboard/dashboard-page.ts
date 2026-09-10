@@ -7,6 +7,7 @@ import { forkJoin } from 'rxjs';
 
 import { CareApiService } from '../care/care-api.service';
 import { CareDashboardDto, DashboardItemDto } from '../care/care.dto';
+import { parseQuantityMl } from '../care/parse-quantity-ml';
 import { LocationsApiService } from '../locations/locations-api.service';
 import { PhotoUrlService } from '../photos/photo-url.service';
 import { PlantDto } from '../plants/plant.dto';
@@ -29,13 +30,8 @@ export class DashboardPage {
   protected readonly locationNames = signal<Record<string, string>>({});
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly wateringPlantId = signal<string | null>(null);
+  protected readonly mutatingKey = signal<string | null>(null);
   protected readonly quantityDrafts = signal<Record<string, string>>({});
-  protected readonly hasAnyTasks = computed(() => {
-    const data = this.dashboard();
-    if (!data) return false;
-    return data.overdue.length + data.dueToday.length + data.upcoming.length > 0;
-  });
   protected readonly todayItems = computed(() => {
     const data = this.dashboard();
     if (!data) return [];
@@ -61,10 +57,6 @@ export class DashboardPage {
     }).format(new Date());
   }
 
-  protected careLabel(type: string): string {
-    return type === 'FERTILIZING' ? 'nawożenie' : 'podlewanie';
-  }
-
   protected actionVerb(type: string): string {
     return type === 'FERTILIZING' ? 'Nawieź' : 'Podlej';
   }
@@ -73,50 +65,40 @@ export class DashboardPage {
     return item.plantId + item.careType;
   }
 
-  protected dueDate(iso: string): string {
-    return new Intl.DateTimeFormat('pl-PL', {
-      day: 'numeric',
-      month: 'long',
-      timeZone: 'Europe/Warsaw',
-    }).format(new Date(`${iso}T12:00:00`));
-  }
-
   protected water(item: DashboardItemDto): void {
-    const quantityMl = this.parseMl(this.quantityDrafts()[item.plantId]);
+    const quantityMl = parseQuantityMl(this.quantityDrafts()[item.plantId]);
     if (quantityMl === 'invalid') {
       this.error.set('Ilość wody musi być liczbą całkowitą większą od 0');
       return;
     }
-    this.wateringPlantId.set(this.itemKey(item));
+    this.error.set(null);
+    this.mutatingKey.set(this.itemKey(item));
     this.api.water(item.plantId, quantityMl).subscribe({
       next: () => {
-        this.wateringPlantId.set(null);
+        this.mutatingKey.set(null);
         this.quantityDrafts.update((drafts) => ({ ...drafts, [item.plantId]: '' }));
         this.reload();
       },
       error: () => {
-        this.wateringPlantId.set(null);
+        this.mutatingKey.set(null);
         this.error.set('Nie udało się oznaczyć podlewania');
       },
     });
   }
 
   protected fertilize(item: DashboardItemDto): void {
-    this.wateringPlantId.set(this.itemKey(item));
+    this.error.set(null);
+    this.mutatingKey.set(this.itemKey(item));
     this.api.fertilize(item.plantId).subscribe({
       next: () => {
-        this.wateringPlantId.set(null);
+        this.mutatingKey.set(null);
         this.reload();
       },
       error: () => {
-        this.wateringPlantId.set(null);
+        this.mutatingKey.set(null);
         this.error.set('Nie udało się oznaczyć nawożenia');
       },
     });
-  }
-
-  protected locationFor(item: DashboardItemDto): string {
-    return item.locationName || '';
   }
 
   protected plantLocation(plant: PlantDto): string {
@@ -132,17 +114,6 @@ export class DashboardPage {
       ...drafts,
       [plantId]: value == null ? '' : String(value),
     }));
-  }
-
-  private parseMl(raw: string | number | null | undefined): number | null | 'invalid' {
-    if (raw == null || raw === '') {
-      return null;
-    }
-    const quantityMl = typeof raw === 'number' ? raw : Number(String(raw).trim());
-    if (!Number.isInteger(quantityMl) || quantityMl < 1) {
-      return 'invalid';
-    }
-    return quantityMl;
   }
 
   private reload(): void {

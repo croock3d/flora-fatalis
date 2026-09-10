@@ -99,10 +99,11 @@
             id="partnerEmail"
             class="household__input"
             type="email"
+            name="inviteEmail"
             autocomplete="email"
             placeholder="partner@example.com"
-            [value]="inviteEmail()"
-            (input)="setEmail($any($event.target).value)"
+            [ngModel]="inviteEmail()"
+            (ngModelChange)="setEmail($event)"
             required
           />
           <button class="btn" type="submit" [disabled]="loading() || !inviteEmail().trim()">
