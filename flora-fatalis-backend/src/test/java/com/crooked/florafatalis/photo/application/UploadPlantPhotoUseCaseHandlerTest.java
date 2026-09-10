@@ -70,8 +70,7 @@ class UploadPlantPhotoUseCaseHandlerTest {
 
     PlantPhoto uploaded =
         handler.upload(
-            new UploadPlantPhotoCommand(
-                userId, plant.id(), "leaf.jpg", "image/jpeg", new byte[] {1, 2, 3}));
+            new UploadPlantPhotoCommand(userId, plant.id(), "image/jpeg", new byte[] {1, 2, 3}));
 
     ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
     then(photoStorage).should().store(keyCaptor.capture(), org.mockito.ArgumentMatchers.any());
@@ -97,8 +96,7 @@ class UploadPlantPhotoUseCaseHandlerTest {
     assertThatThrownBy(
             () ->
                 handler.upload(
-                    new UploadPlantPhotoCommand(
-                        userId, plant.id(), "leaf.gif", "image/gif", new byte[] {1})))
+                    new UploadPlantPhotoCommand(userId, plant.id(), "image/gif", new byte[] {1})))
         .isInstanceOf(IllegalArgumentException.class);
   }
 }

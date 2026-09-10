@@ -41,9 +41,4 @@ public record Household(HouseholdId id, UserId ownerId, UserId partnerId, Instan
     }
     return new Household(id, ownerId, null, createdAt);
   }
-
-  public Household withOwner(UserId newOwnerId) {
-    Objects.requireNonNull(newOwnerId, "newOwnerId must not be null");
-    return new Household(id, newOwnerId, null, createdAt);
-  }
 }

@@ -34,13 +34,6 @@ public class HouseholdInvitationRepositoryAdapter implements HouseholdInvitation
   }
 
   @Override
-  public Optional<HouseholdInvitation> findByInviter(UserId inviterId) {
-    return jpaRepository
-        .findByInviterId(inviterId.value())
-        .map(HouseholdInvitationEntityMapper::toDomain);
-  }
-
-  @Override
   public Optional<HouseholdInvitation> findByInvitee(UserId inviteeId) {
     return jpaRepository
         .findByInviteeId(inviteeId.value())

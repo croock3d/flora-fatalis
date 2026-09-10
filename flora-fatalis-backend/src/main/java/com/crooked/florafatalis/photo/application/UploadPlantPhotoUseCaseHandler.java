@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class UploadPlantPhotoUseCaseHandler implements UploadPlantPhotoUseCase {
   private final Clock clock;
 
   @Override
+  @Transactional
   public PlantPhoto upload(UploadPlantPhotoCommand command) {
     if (command.content() == null || command.content().length == 0) {
       throw new IllegalArgumentException("photo content must not be empty");

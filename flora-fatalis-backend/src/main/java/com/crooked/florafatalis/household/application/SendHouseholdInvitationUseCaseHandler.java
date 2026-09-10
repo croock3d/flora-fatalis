@@ -11,6 +11,7 @@ import com.crooked.florafatalis.household.domain.HouseholdInvitationId;
 import com.crooked.florafatalis.shared.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,12 +22,12 @@ public class SendHouseholdInvitationUseCaseHandler implements SendHouseholdInvit
   private final UserLookupPort userLookupPort;
 
   @Override
+  @Transactional
   public void send(SendHouseholdInvitationCommand command) {
     UserId inviteeId =
         userLookupPort
             .findUserIdByEmail(command.inviteeEmail())
-            .orElseThrow(
-                () -> new IllegalArgumentException("User not found: " + command.inviteeEmail()));
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     if (command.inviterId().equals(inviteeId)) {
       throw new IllegalArgumentException("Cannot invite yourself");

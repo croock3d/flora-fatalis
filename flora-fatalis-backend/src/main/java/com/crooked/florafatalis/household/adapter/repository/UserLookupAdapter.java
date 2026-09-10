@@ -15,7 +15,8 @@ public class UserLookupAdapter implements UserLookupPort {
 
   @Override
   public Optional<UserId> findUserIdByEmail(String email) {
-    return userJpaRepository.findByEmail(email).map(entity -> new UserId(entity.getId()));
+    String normalized = email == null ? "" : email.toLowerCase().strip();
+    return userJpaRepository.findByEmail(normalized).map(entity -> new UserId(entity.getId()));
   }
 
   @Override

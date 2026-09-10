@@ -9,6 +9,7 @@ import com.crooked.florafatalis.location.domain.LocationKind;
 import com.crooked.florafatalis.shared.application.port.out.ActiveHouseholdPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class CreateLocationUseCaseHandler implements CreateLocationUseCase {
   private final ActiveHouseholdPort activeHouseholdPort;
 
   @Override
+  @Transactional
   public Location create(CreateLocationCommand command) {
     HouseholdId householdId =
         activeHouseholdPort

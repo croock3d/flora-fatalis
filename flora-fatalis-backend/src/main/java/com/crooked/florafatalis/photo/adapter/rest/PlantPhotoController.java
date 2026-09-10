@@ -59,7 +59,6 @@ class PlantPhotoController {
             new UploadPlantPhotoCommand(
                 currentUserProvider.currentUserId(),
                 new PlantId(plantId),
-                file.getOriginalFilename(),
                 file.getContentType(),
                 file.getBytes())));
   }

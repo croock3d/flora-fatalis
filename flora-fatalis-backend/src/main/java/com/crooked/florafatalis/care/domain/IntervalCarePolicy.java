@@ -6,9 +6,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
 
-@Component
 public class IntervalCarePolicy implements CarePolicy {
 
   @Override

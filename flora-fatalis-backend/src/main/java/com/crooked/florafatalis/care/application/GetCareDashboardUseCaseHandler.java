@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,17 +49,14 @@ public class GetCareDashboardUseCaseHandler implements GetCareDashboardUseCase {
   private final PlantPhotoRepository plantPhotoRepository;
   private final LocationRepository locationRepository;
   private final Clock clock;
-
-  @Value("${app.timezone:Europe/Warsaw}")
-  private String timezone;
+  private final ZoneId appZoneId;
 
   @Override
   public CareDashboard get(UserId userId) {
-    ZoneId zone = ZoneId.of(timezone);
-    LocalDate today = LocalDate.now(clock.withZone(zone));
+    LocalDate today = LocalDate.now(clock.withZone(appZoneId));
     return activeHouseholdPort
         .findActiveHouseholdId(userId)
-        .map(householdId -> build(householdId, today, zone))
+        .map(householdId -> build(householdId, today, appZoneId))
         .orElse(new CareDashboard(List.of(), List.of(), List.of()));
   }
 

@@ -82,4 +82,17 @@ class RegisterUserUseCaseHandlerTest {
     then(passwordEncoder).shouldHaveNoInteractions();
     then(createOwnerHouseholdPort).shouldHaveNoInteractions();
   }
+
+  @Test
+  void shortPasswordThrows() {
+    RegisterUserCommand command =
+        new RegisterUserCommand("jan@example.com", "short", "Jan Kowalski");
+
+    assertThatThrownBy(() -> useCase.register(command))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("password");
+    then(userRepository).shouldHaveNoInteractions();
+    then(passwordEncoder).shouldHaveNoInteractions();
+    then(createOwnerHouseholdPort).shouldHaveNoInteractions();
+  }
 }

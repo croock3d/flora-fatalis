@@ -4,6 +4,7 @@ import com.crooked.florafatalis.care.domain.CareEventNotFoundException;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdAlreadyExistsException;
 import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
+import com.crooked.florafatalis.household.domain.HouseholdNotFoundException;
 import com.crooked.florafatalis.household.domain.NoActiveHouseholdException;
 import com.crooked.florafatalis.location.domain.LocationInUseException;
 import com.crooked.florafatalis.location.domain.LocationNotFoundException;
@@ -36,9 +37,9 @@ class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.FORBIDDEN)
   void handleHouseholdAccessDenied() {}
 
-  @ExceptionHandler(HouseholdInvitationNotFoundException.class)
+  @ExceptionHandler({HouseholdInvitationNotFoundException.class, HouseholdNotFoundException.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  void handleHouseholdInvitationNotFound() {}
+  void handleHouseholdNotFound() {}
 
   @ExceptionHandler(NoActiveHouseholdException.class)
   @ResponseStatus(HttpStatus.CONFLICT)

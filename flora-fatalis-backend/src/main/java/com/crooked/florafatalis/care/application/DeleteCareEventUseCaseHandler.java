@@ -10,6 +10,7 @@ import com.crooked.florafatalis.household.domain.NoActiveHouseholdException;
 import com.crooked.florafatalis.shared.application.port.out.ActiveHouseholdPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +20,7 @@ public class DeleteCareEventUseCaseHandler implements DeleteCareEventUseCase {
   private final ActiveHouseholdPort activeHouseholdPort;
 
   @Override
+  @Transactional
   public void delete(DeleteCareEventCommand command) {
     HouseholdId householdId =
         activeHouseholdPort

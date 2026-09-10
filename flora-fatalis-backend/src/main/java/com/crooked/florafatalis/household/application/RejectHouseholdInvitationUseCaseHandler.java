@@ -7,6 +7,7 @@ import com.crooked.florafatalis.household.domain.HouseholdInvitation;
 import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class RejectHouseholdInvitationUseCaseHandler implements RejectHouseholdI
   private final HouseholdInvitationRepository invitationRepository;
 
   @Override
+  @Transactional
   public void reject(RejectHouseholdInvitationCommand command) {
     HouseholdInvitation invitation =
         invitationRepository

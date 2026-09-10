@@ -27,10 +27,10 @@ class LocationTest {
   }
 
   @Test
-  void renameUpdatesNameAndKind() {
+  void updateChangesNameAndKind() {
     Location location = Location.create(householdId, "Salon", LocationKind.INDOOR);
 
-    Location updated = location.rename("Balkon", LocationKind.BALCONY);
+    Location updated = location.update("Balkon", LocationKind.BALCONY);
 
     assertThat(updated.id()).isEqualTo(location.id());
     assertThat(updated.name()).isEqualTo("Balkon");

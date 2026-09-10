@@ -5,9 +5,10 @@ import com.crooked.florafatalis.household.application.port.out.HouseholdReposito
 import com.crooked.florafatalis.household.application.port.out.UserActiveHouseholdPort;
 import com.crooked.florafatalis.household.domain.Household;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
-import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
+import com.crooked.florafatalis.household.domain.HouseholdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +18,12 @@ public class SwitchActiveHouseholdUseCaseHandler implements SwitchActiveHousehol
   private final UserActiveHouseholdPort userActiveHouseholdPort;
 
   @Override
+  @Transactional
   public void switchTo(SwitchActiveHouseholdCommand command) {
     Household household =
         householdRepository
             .findById(command.householdId())
-            .orElseThrow(HouseholdInvitationNotFoundException::new);
+            .orElseThrow(HouseholdNotFoundException::new);
 
     if (!household.isMember(command.currentUserId())) {
       throw new HouseholdAccessDeniedException();

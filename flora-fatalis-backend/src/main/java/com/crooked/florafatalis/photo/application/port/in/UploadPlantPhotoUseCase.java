@@ -9,9 +9,5 @@ public interface UploadPlantPhotoUseCase {
   PlantPhoto upload(UploadPlantPhotoCommand command);
 
   record UploadPlantPhotoCommand(
-      UserId userId,
-      PlantId plantId,
-      String originalFilename,
-      String contentType,
-      byte[] content) {}
+      UserId userId, PlantId plantId, String contentType, byte[] content) {}
 }

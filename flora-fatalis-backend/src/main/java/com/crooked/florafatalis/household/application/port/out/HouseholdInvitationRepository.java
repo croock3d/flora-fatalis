@@ -14,8 +14,6 @@ public interface HouseholdInvitationRepository {
 
   Optional<HouseholdInvitation> findByHouseholdId(HouseholdId householdId);
 
-  Optional<HouseholdInvitation> findByInviter(UserId inviterId);
-
   Optional<HouseholdInvitation> findByInvitee(UserId inviteeId);
 
   void delete(HouseholdInvitationId id);

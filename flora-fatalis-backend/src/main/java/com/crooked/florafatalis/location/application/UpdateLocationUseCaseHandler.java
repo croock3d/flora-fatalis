@@ -11,6 +11,7 @@ import com.crooked.florafatalis.location.domain.LocationNotFoundException;
 import com.crooked.florafatalis.shared.application.port.out.ActiveHouseholdPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class UpdateLocationUseCaseHandler implements UpdateLocationUseCase {
   private final ActiveHouseholdPort activeHouseholdPort;
 
   @Override
+  @Transactional
   public Location update(UpdateLocationCommand command) {
     HouseholdId householdId =
         activeHouseholdPort
@@ -32,7 +34,7 @@ public class UpdateLocationUseCaseHandler implements UpdateLocationUseCase {
     if (!existing.householdId().equals(householdId)) {
       throw new HouseholdAccessDeniedException();
     }
-    Location updated = existing.rename(command.name(), LocationKind.valueOf(command.kind()));
+    Location updated = existing.update(command.name(), LocationKind.valueOf(command.kind()));
     locationRepository.save(updated);
     return updated;
   }

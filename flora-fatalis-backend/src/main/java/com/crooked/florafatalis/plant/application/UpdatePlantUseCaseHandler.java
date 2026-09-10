@@ -15,6 +15,7 @@ import com.crooked.florafatalis.species.application.port.out.SpeciesRepository;
 import com.crooked.florafatalis.species.domain.SpeciesNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class UpdatePlantUseCaseHandler implements UpdatePlantUseCase {
   private final ActiveHouseholdPort activeHouseholdPort;
 
   @Override
+  @Transactional
   public Plant update(UpdatePlantCommand command) {
     HouseholdId householdId =
         activeHouseholdPort

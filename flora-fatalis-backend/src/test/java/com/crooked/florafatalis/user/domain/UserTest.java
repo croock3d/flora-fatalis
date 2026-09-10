@@ -41,6 +41,16 @@ class UserTest {
   }
 
   @Test
+  void reconstituteKeepsCreatedAt() {
+    Instant createdAt = Instant.parse("2026-01-01T00:00:00Z");
+
+    User user = User.reconstitute(userId, email, hashedPassword, displayName, createdAt);
+
+    assertThat(user.createdAt()).isEqualTo(createdAt);
+    assertThat(user.email()).isEqualTo(email);
+  }
+
+  @Test
   void registerWithNullUserIdThrows() {
     assertThatThrownBy(() -> User.register(null, email, hashedPassword, displayName))
         .isInstanceOf(NullPointerException.class);

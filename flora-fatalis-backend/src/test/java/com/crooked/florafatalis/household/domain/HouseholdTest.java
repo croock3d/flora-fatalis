@@ -59,15 +59,6 @@ class HouseholdTest {
   }
 
   @Test
-  void withOwnerChangesOwnerAndClearsPartner() {
-    Household household =
-        Household.createForOwner(householdId, ownerId).join(partnerId).withOwner(partnerId);
-
-    assertThat(household.ownerId()).isEqualTo(partnerId);
-    assertThat(household.partnerId()).isNull();
-  }
-
-  @Test
   void isMemberRecognizesOwnerAndPartner() {
     Household household = Household.createForOwner(householdId, ownerId).join(partnerId);
 

@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/household")
 @RequiredArgsConstructor
-public class HouseholdController {
+class HouseholdController {
 
   private final SendHouseholdInvitationUseCase sendHouseholdInvitationUseCase;
   private final AcceptHouseholdInvitationUseCase acceptHouseholdInvitationUseCase;

@@ -22,7 +22,7 @@ public record Location(LocationId id, HouseholdId householdId, String name, Loca
     return new Location(LocationId.newId(), householdId, name.strip(), kind);
   }
 
-  public Location rename(String newName, LocationKind newKind) {
+  public Location update(String newName, LocationKind newKind) {
     return new Location(id, householdId, newName.strip(), newKind);
   }
 }

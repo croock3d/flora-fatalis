@@ -1,6 +1,7 @@
 package com.crooked.florafatalis.care.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -8,6 +9,7 @@ import com.crooked.florafatalis.care.application.port.in.WaterPlantUseCase.Water
 import com.crooked.florafatalis.care.application.port.out.CareEventRepository;
 import com.crooked.florafatalis.care.domain.CareEvent;
 import com.crooked.florafatalis.care.domain.CareType;
+import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdId;
 import com.crooked.florafatalis.location.domain.LocationId;
 import com.crooked.florafatalis.plant.application.port.out.PlantRepository;
@@ -97,5 +99,46 @@ class WaterPlantUseCaseHandlerTest {
     ArgumentCaptor<CareEvent> captor = ArgumentCaptor.forClass(CareEvent.class);
     then(careEventRepository).should().save(captor.capture());
     assertThat(captor.getValue().quantityMl()).isEqualTo(250);
+  }
+
+  @Test
+  void plantFromOtherHouseholdThrows() {
+    Plant plant =
+        Plant.create(
+            HouseholdId.newId(),
+            SpeciesId.newId(),
+            LocationId.newId(),
+            "Monstera",
+            null,
+            null,
+            null,
+            userId,
+            now);
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
+
+    assertThatThrownBy(() -> handler.water(new WaterPlantCommand(userId, plant.id(), null)))
+        .isInstanceOf(HouseholdAccessDeniedException.class);
+  }
+
+  @Test
+  void archivedPlantThrows() {
+    Plant plant =
+        Plant.create(
+                householdId,
+                SpeciesId.newId(),
+                LocationId.newId(),
+                "Monstera",
+                null,
+                null,
+                null,
+                userId,
+                now)
+            .archive(now);
+    given(activeHouseholdPort.findActiveHouseholdId(userId)).willReturn(Optional.of(householdId));
+    given(plantRepository.findById(plant.id())).willReturn(Optional.of(plant));
+
+    assertThatThrownBy(() -> handler.water(new WaterPlantCommand(userId, plant.id(), null)))
+        .isInstanceOf(HouseholdAccessDeniedException.class);
   }
 }

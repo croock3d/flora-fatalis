@@ -9,7 +9,5 @@ public interface HouseholdInvitationJpaRepository
 
   Optional<HouseholdInvitationEntity> findByHouseholdId(UUID householdId);
 
-  Optional<HouseholdInvitationEntity> findByInviterId(UUID inviterId);
-
   Optional<HouseholdInvitationEntity> findByInviteeId(UUID inviteeId);
 }

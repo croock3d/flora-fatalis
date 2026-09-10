@@ -39,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
         UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(
-                claims.getSubject(), token, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                claims.getSubject(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        authentication.setDetails(claims.get("displayName", String.class));
         SecurityContextHolder.getContext().setAuthentication(authentication);
       } catch (Exception ignored) {
         SecurityContextHolder.clearContext();

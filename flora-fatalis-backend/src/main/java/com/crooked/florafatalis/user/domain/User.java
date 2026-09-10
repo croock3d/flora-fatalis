@@ -27,11 +27,21 @@ public class User {
 
   public static User register(
       UserId id, Email email, HashedPassword hashedPassword, DisplayName displayName) {
+    return reconstitute(id, email, hashedPassword, displayName, Instant.now());
+  }
+
+  public static User reconstitute(
+      UserId id,
+      Email email,
+      HashedPassword hashedPassword,
+      DisplayName displayName,
+      Instant createdAt) {
     Objects.requireNonNull(id, "id must not be null");
     Objects.requireNonNull(email, "email must not be null");
     Objects.requireNonNull(hashedPassword, "hashedPassword must not be null");
     Objects.requireNonNull(displayName, "displayName must not be null");
-    return new User(id, email, hashedPassword, displayName, Instant.now());
+    Objects.requireNonNull(createdAt, "createdAt must not be null");
+    return new User(id, email, hashedPassword, displayName, createdAt);
   }
 
   public UserId id() {

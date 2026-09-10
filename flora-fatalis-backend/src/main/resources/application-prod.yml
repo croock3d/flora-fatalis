@@ -15,3 +15,4 @@ app:
     secret: ${JWT_SECRET}
   photos:
     dir: ${PHOTOS_DIR:/data/photos}
+    seed-demo: false

@@ -20,7 +20,12 @@ public class UserRepositoryAdapter implements UserRepository {
 
   @Override
   public void save(User user) {
-    UserEntity entity = toEntity(user);
+    UserEntity entity = jpaRepository.findById(user.id().value()).orElseGet(UserEntity::new);
+    entity.setId(user.id().value());
+    entity.setEmail(user.email().value());
+    entity.setHashedPassword(user.hashedPassword().value());
+    entity.setDisplayName(user.displayName().value());
+    entity.setCreatedAt(user.createdAt());
     jpaRepository.save(entity);
   }
 
@@ -34,21 +39,12 @@ public class UserRepositoryAdapter implements UserRepository {
     return jpaRepository.existsByEmail(email);
   }
 
-  private UserEntity toEntity(User user) {
-    UserEntity entity = new UserEntity();
-    entity.setId(user.id().value());
-    entity.setEmail(user.email().value());
-    entity.setHashedPassword(user.hashedPassword().value());
-    entity.setDisplayName(user.displayName().value());
-    entity.setCreatedAt(user.createdAt());
-    return entity;
-  }
-
   private User toDomain(UserEntity entity) {
-    return User.register(
+    return User.reconstitute(
         new UserId(entity.getId()),
         new Email(entity.getEmail()),
         new HashedPassword(entity.getHashedPassword()),
-        new DisplayName(entity.getDisplayName()));
+        new DisplayName(entity.getDisplayName()),
+        entity.getCreatedAt());
   }
 }

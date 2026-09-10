@@ -12,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class ArchivePlantUseCaseHandler implements ArchivePlantUseCase {
   private final Clock clock;
 
   @Override
+  @Transactional
   public void archive(ArchivePlantCommand command) {
     HouseholdId householdId =
         activeHouseholdPort

@@ -37,9 +37,4 @@ public class HouseholdRepositoryAdapter implements HouseholdRepository {
         .map(HouseholdEntityMapper::toDomain)
         .toList();
   }
-
-  @Override
-  public void delete(HouseholdId id) {
-    jpaRepository.deleteById(id.value());
-  }
 }

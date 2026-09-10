@@ -16,6 +16,4 @@ public interface CareEventJpaRepository extends JpaRepository<CareEventEntity, U
 
   List<CareEventEntity> findByHouseholdIdAndCareTypeOrderByPerformedAtDesc(
       UUID householdId, String careType);
-
-  List<CareEventEntity> findByHouseholdId(UUID householdId);
 }

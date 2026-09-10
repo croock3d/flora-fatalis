@@ -16,8 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,11 +27,10 @@ public class PrunePlantUseCaseHandler implements PrunePlantUseCase {
   private final CareEventRepository careEventRepository;
   private final ActiveHouseholdPort activeHouseholdPort;
   private final Clock clock;
-
-  @Value("${app.timezone:Europe/Warsaw}")
-  private String timezone;
+  private final ZoneId appZoneId;
 
   @Override
+  @Transactional
   public CareEvent prune(PrunePlantCommand command) {
     HouseholdId householdId =
         activeHouseholdPort
@@ -55,14 +54,13 @@ public class PrunePlantUseCaseHandler implements PrunePlantUseCase {
   }
 
   private Instant resolvePerformedAt(LocalDate performedOn) {
-    ZoneId zone = ZoneId.of(timezone);
-    LocalDate today = LocalDate.now(clock.withZone(zone));
+    LocalDate today = LocalDate.now(clock.withZone(appZoneId));
     if (performedOn == null || performedOn.equals(today)) {
       return Instant.now(clock);
     }
     if (performedOn.isAfter(today)) {
       throw new IllegalArgumentException("performedOn must not be in the future");
     }
-    return performedOn.atTime(LocalTime.NOON).atZone(zone).toInstant();
+    return performedOn.atTime(LocalTime.NOON).atZone(appZoneId).toInstant();
   }
 }

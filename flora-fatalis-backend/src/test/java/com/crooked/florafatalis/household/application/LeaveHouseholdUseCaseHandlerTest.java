@@ -12,7 +12,7 @@ import com.crooked.florafatalis.household.application.port.out.UserActiveHouseho
 import com.crooked.florafatalis.household.domain.Household;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdId;
-import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
+import com.crooked.florafatalis.household.domain.HouseholdNotFoundException;
 import com.crooked.florafatalis.shared.domain.UserId;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,7 +78,7 @@ class LeaveHouseholdUseCaseHandlerTest {
     given(householdRepository.findById(householdId)).willReturn(Optional.empty());
 
     assertThatThrownBy(() -> handler.leave(new LeaveHouseholdCommand(householdId, ownerId)))
-        .isInstanceOf(HouseholdInvitationNotFoundException.class);
+        .isInstanceOf(HouseholdNotFoundException.class);
   }
 
   @Test

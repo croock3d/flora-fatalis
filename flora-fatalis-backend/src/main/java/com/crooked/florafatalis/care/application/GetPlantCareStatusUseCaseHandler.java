@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,9 +38,7 @@ public class GetPlantCareStatusUseCaseHandler implements GetPlantCareStatusUseCa
   private final FertilizingCarePolicy fertilizingCarePolicy;
   private final ActiveHouseholdPort activeHouseholdPort;
   private final Clock clock;
-
-  @Value("${app.timezone:Europe/Warsaw}")
-  private String timezone;
+  private final ZoneId appZoneId;
 
   @Override
   public PlantCareStatus get(UserId userId, PlantId plantId) {
@@ -55,18 +52,18 @@ public class GetPlantCareStatusUseCaseHandler implements GetPlantCareStatusUseCa
     }
     Species species =
         speciesRepository.findById(plant.speciesId()).orElseThrow(SpeciesNotFoundException::new);
-    ZoneId zone = ZoneId.of(timezone);
-    LocalDate today = LocalDate.now(clock.withZone(zone));
+    LocalDate today = LocalDate.now(clock.withZone(appZoneId));
     Optional<Instant> lastWatering =
         careEventRepository.findLatest(plantId, CareType.WATERING).map(CareEvent::performedAt);
     Optional<Instant> lastFertilizing =
         careEventRepository.findLatest(plantId, CareType.FERTILIZING).map(CareEvent::performedAt);
-    CareRecommendation watering = carePolicy.recommend(plant, species, lastWatering, today, zone);
+    CareRecommendation watering =
+        carePolicy.recommend(plant, species, lastWatering, today, appZoneId);
     CareTypeStatus wateringStatus =
         new CareTypeStatus(lastWatering.orElse(null), watering.dueOn(), watering.intervalDays());
     CareTypeStatus fertilizingStatus =
         fertilizingCarePolicy
-            .recommend(plant, species, lastFertilizing, today, zone)
+            .recommend(plant, species, lastFertilizing, today, appZoneId)
             .map(
                 recommendation ->
                     new CareTypeStatus(

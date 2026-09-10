@@ -33,3 +33,5 @@ databaseChangeLog:
       file: db/changelog/015-add-care-event-pruning-kind.yml
   - include:
       file: db/changelog/016-seed-dev-demo-data.yml
+  - include:
+      file: db/changelog/017-seed-dev-demo-photos.yml

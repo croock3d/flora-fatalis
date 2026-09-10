@@ -6,7 +6,7 @@ import com.crooked.florafatalis.household.application.port.out.HouseholdReposito
 import com.crooked.florafatalis.household.application.port.out.UserActiveHouseholdPort;
 import com.crooked.florafatalis.household.domain.Household;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
-import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
+import com.crooked.florafatalis.household.domain.HouseholdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class LeaveHouseholdUseCaseHandler implements LeaveHouseholdUseCase {
     Household household =
         householdRepository
             .findById(command.householdId())
-            .orElseThrow(HouseholdInvitationNotFoundException::new);
+            .orElseThrow(HouseholdNotFoundException::new);
 
     if (!household.isMember(command.currentUserId())) {
       throw new HouseholdAccessDeniedException();

@@ -30,7 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PrunePlantUseCaseHandlerTest {
@@ -52,8 +51,8 @@ class PrunePlantUseCaseHandlerTest {
             plantRepository,
             careEventRepository,
             activeHouseholdPort,
-            Clock.fixed(now, ZoneOffset.UTC));
-    ReflectionTestUtils.setField(handler, "timezone", "UTC");
+            Clock.fixed(now, ZoneOffset.UTC),
+            ZoneOffset.UTC);
   }
 
   @Test

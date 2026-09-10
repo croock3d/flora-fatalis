@@ -64,12 +64,12 @@ class AuthControllerIT extends IntegrationTestBase {
     // given
     var registerBody =
         """
-        {"email":"charlie@example.com","password":"pass456","displayName":"Charlie"}
+        {"email":"charlie@example.com","password":"pass4567","displayName":"Charlie"}
         """;
     post("/api/auth/register", registerBody);
     var loginBody =
         """
-        {"email":"charlie@example.com","password":"pass456"}
+        {"email":"charlie@example.com","password":"pass4567"}
         """;
 
     // when
@@ -95,7 +95,7 @@ class AuthControllerIT extends IntegrationTestBase {
     // given
     var registerBody =
         """
-        {"email":"dave@example.com","password":"correct","displayName":"Dave"}
+        {"email":"dave@example.com","password":"correct1","displayName":"Dave"}
         """;
     post("/api/auth/register", registerBody);
     var loginBody =
@@ -125,12 +125,12 @@ class AuthControllerIT extends IntegrationTestBase {
     // given
     var registerBody =
         """
-        {"email":"eve@example.com","password":"eve123","displayName":"Eve"}
+        {"email":"eve@example.com","password":"eve12345","displayName":"Eve"}
         """;
     post("/api/auth/register", registerBody);
     var loginBody =
         """
-        {"email":"eve@example.com","password":"eve123"}
+        {"email":"eve@example.com","password":"eve12345"}
         """;
     ResponseEntity<LoginResponseBody> loginResponse =
         restClient

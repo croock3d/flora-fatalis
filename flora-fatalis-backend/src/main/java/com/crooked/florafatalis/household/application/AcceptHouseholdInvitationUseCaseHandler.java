@@ -8,6 +8,7 @@ import com.crooked.florafatalis.household.domain.Household;
 import com.crooked.florafatalis.household.domain.HouseholdAccessDeniedException;
 import com.crooked.florafatalis.household.domain.HouseholdInvitation;
 import com.crooked.florafatalis.household.domain.HouseholdInvitationNotFoundException;
+import com.crooked.florafatalis.household.domain.HouseholdNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ public class AcceptHouseholdInvitationUseCaseHandler implements AcceptHouseholdI
     Household inviterHousehold =
         householdRepository
             .findById(invitation.householdId())
-            .orElseThrow(HouseholdInvitationNotFoundException::new);
+            .orElseThrow(HouseholdNotFoundException::new);
 
     if (inviterHousehold.hasPartner()) {
       throw new IllegalStateException("Inviter household already has a partner");

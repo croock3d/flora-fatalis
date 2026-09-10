@@ -12,6 +12,7 @@ import com.crooked.florafatalis.shared.application.port.out.ActiveHouseholdPort;
 import com.crooked.florafatalis.shared.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class SetPrimaryPlantPhotoUseCaseHandler implements SetPrimaryPlantPhotoU
   private final ActiveHouseholdPort activeHouseholdPort;
 
   @Override
+  @Transactional
   public void setPrimary(UserId userId, PlantPhotoId photoId) {
     HouseholdId householdId =
         activeHouseholdPort

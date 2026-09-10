@@ -14,6 +14,7 @@ import java.time.Clock;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class WaterPlantUseCaseHandler implements WaterPlantUseCase {
   private final Clock clock;
 
   @Override
+  @Transactional
   public CareEvent water(WaterPlantCommand command) {
     HouseholdId householdId =
         activeHouseholdPort

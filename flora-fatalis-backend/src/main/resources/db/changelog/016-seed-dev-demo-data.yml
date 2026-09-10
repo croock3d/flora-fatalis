@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-seed-dev-demo-data
+      author: flora-fatalis
+      context: dev
+      changes:
+        - sqlFile:
+            path: data/seed-dev-demo-data.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

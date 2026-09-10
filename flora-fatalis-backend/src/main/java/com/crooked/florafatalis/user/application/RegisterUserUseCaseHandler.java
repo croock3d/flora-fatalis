@@ -26,6 +26,9 @@ public class RegisterUserUseCaseHandler implements RegisterUserUseCase {
   @Transactional
   public void register(RegisterUserCommand command) {
     Email email = new Email(command.email());
+    if (command.rawPassword() == null || command.rawPassword().length() < 8) {
+      throw new IllegalArgumentException("password must be at least 8 characters");
+    }
     if (userRepository.existsByEmail(email.value())) {
       throw new EmailAlreadyTakenException(email.value());
     }

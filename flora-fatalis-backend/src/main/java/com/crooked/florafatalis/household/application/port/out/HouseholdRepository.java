@@ -15,6 +15,4 @@ public interface HouseholdRepository {
   Optional<Household> findOwnedBy(UserId userId);
 
   List<Household> findAllByMember(UserId userId);
-
-  void delete(HouseholdId id);
 }
