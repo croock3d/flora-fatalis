@@ -16,7 +16,7 @@ public class SpaFallbackController {
   public String forward(HttpServletRequest request) throws NoResourceFoundException {
     String path = request.getServletPath();
     if (path.equals("/api") || path.startsWith("/api/")) {
-      throw new NoResourceFoundException(HttpMethod.GET, path);
+      throw new NoResourceFoundException(HttpMethod.GET, path, path);
     }
     return "forward:/index.html";
   }
